@@ -1,0 +1,11 @@
+si 1
+device nrf52832_XXAA
+speed 1000
+erase
+r
+h
+sleep 200
+loadfile dwm1001-flash.hex
+sleep 200
+r
+q
