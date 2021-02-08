@@ -37,7 +37,7 @@ int dwm_user_start(void) {
   // Event thread
   uint8_t event_hndl;
 
-  if(!err_check(dwm_thread_create(THREAD_PRIO, dwm_anchor_scan_thread, (void*)NULL,
+  if(!err_check(dwm_thread_create(THREAD_PRIO, dwm_event_thread, (void*)NULL,
                   "Event_handler", THREAD_STACK_SIZE, &event_hndl))) {
     return -1;
   }

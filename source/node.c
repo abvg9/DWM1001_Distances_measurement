@@ -78,43 +78,28 @@ dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_facto
 
 void dwm_event_callback(dwm_evt_t *p_evt) {
 
-  int i;
   switch (p_evt->header.id) {
     case DWM_EVT_LOC_READY:
       // p_evt->loc.anchors.dist
       blink_led(LED_GREEN, 1, 1);
-      i = 0;
-      i++;
     break;
     case DWM_EVT_UWBMAC_JOINED_CHANGED:
       blink_led(LED_GREEN, 2, 1);
-      i = 0;
-      i++;
     break; 
     case DWM_EVT_BH_INITIALIZED_CHANGED:
       blink_led(LED_GREEN, 3, 1);
-      i = 0;
-      i++;
     break;
     case DWM_EVT_UWB_SCAN_READY:
       blink_led(LED_GREEN, 4, 1);
-      i = 0;
-      i++;
     break;
     case DWM_EVT_USR_DATA_READY:
       blink_led(LED_GREEN, 5, 1);
-      i = 0;
-      i++;
     break;
     case DWM_EVT_USR_DATA_SENT:
       blink_led(LED_RED1, 6, 1);
-      i = 0;
-      i++;
     break;
     default:
       blink_led(LED_RED1, 7, 1);
-      i = 0;
-      i++;
     break;
   }
 
