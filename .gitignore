@@ -1,5 +1,5 @@
 #Folders
-output/*
+output/
 
 # Prerequisites
 *.d
