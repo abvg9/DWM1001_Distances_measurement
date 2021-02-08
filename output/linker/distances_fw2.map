@@ -3254,10 +3254,10 @@ END GROUP
  .debug_abbrev  0x00000000       0xf7 /home/developer/segger-workspace/Distance_measurement/output/compiler/main.o
  .debug_abbrev  0x000000f7      0x1f5 /home/developer/segger-workspace/Distance_measurement/output/compiler/node.o
 
-.debug_line     0x00000000      0x426
+.debug_line     0x00000000      0x420
  *(.debug_line)
- .debug_line    0x00000000      0x161 /home/developer/segger-workspace/Distance_measurement/output/compiler/main.o
- .debug_line    0x00000161      0x2c5 /home/developer/segger-workspace/Distance_measurement/output/compiler/node.o
+ .debug_line    0x00000000      0x15e /home/developer/segger-workspace/Distance_measurement/output/compiler/main.o
+ .debug_line    0x0000015e      0x2c2 /home/developer/segger-workspace/Distance_measurement/output/compiler/node.o
 
 .debug_frame    0x00000000     0x15e4
  *(.debug_frame)
