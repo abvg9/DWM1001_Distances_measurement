@@ -1,6 +1,6 @@
 <!DOCTYPE CrossStudio_Project_File>
-<solution Name="distances" target="8" version="2">
-  <project Name="distances">
+<solution Name="Distance_measurement" target="8" version="2">
+  <project Name="Distance_measurement">
     <folder Name="source">
       <file file_name="source/main.c" />
       <file file_name="source/node.c" />
@@ -14,7 +14,7 @@
       <file file_name="lib/libdwm.a" />
     </folder>
     <configuration
-      Name="distances_configuration"
+      Name="distance_measurement_configuration"
       arm_architecture="v7EM"
       arm_core_type="Cortex-M4"
       arm_endian="Little"
@@ -63,7 +63,7 @@
       external_load_file_type="Detect"
       gcc_debugging_level="Level 3"
       gdb_server_command_line="&quot;/home/developer/JLink_Linux_V694b_x86_64/JLinkGDBServerCLExe&quot; -device &quot;$(DeviceName)&quot; -silent"
-      inherited_configurations="External GNU;"
+      inherited_configurations="External GNU"
       link_linker_script_file="lib/target_s132_fw2.ld"
       link_use_linker_script_file="Yes"
       linker_additional_options=""
@@ -77,7 +77,7 @@
       speed="1000" />
   </project>
   <configuration
-    Name="distances_configuration"
+    Name="distance_measurement_configuration"
     arm_architecture="v7EM"
     arm_core_type="Cortex-M4"
     arm_endian="Little"
@@ -126,7 +126,7 @@
     external_load_file_type="Detect"
     gcc_debugging_level="Level 3"
     gdb_server_command_line="&quot;/home/developer/JLink_Linux_V694b_x86_64/JLinkGDBServerCLExe&quot; -device &quot;$(DeviceName)&quot; -silent"
-    inherited_configurations="External GNU;"
+    inherited_configurations="External GNU"
     link_linker_script_file="lib/target_s132_fw2.ld"
     link_use_linker_script_file="Yes"
     linker_additional_options=""

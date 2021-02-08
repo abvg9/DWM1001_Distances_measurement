@@ -2,14 +2,14 @@
 *.d
 
 # Object files
-*.o
+#*.o
 *.ko
 *.obj
-*.elf
+#*.elf
 
 # Linker output
 *.ilk
-*.map
+#*.map
 *.exp
 
 # Precompiled Headers
@@ -18,7 +18,7 @@
 
 # Libraries
 *.lib
-*.a
+#*.a
 *.la
 *.lo
 
