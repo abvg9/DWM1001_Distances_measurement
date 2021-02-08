@@ -1,6 +1,9 @@
 #Folders
 output/
 
+#Segger configurations
+.emSession
+
 # Prerequisites
 *.d
 
