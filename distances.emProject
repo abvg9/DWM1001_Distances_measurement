@@ -30,7 +30,7 @@
       build_intermediate_directory="output/compiler"
       build_output_directory="output/linker"
       build_output_file_name="$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf"
-      build_toolchain_directory="/home/developer/gcc-arm-none-eabi-5_4-2016/gcc-arm-none-eabi-5_4-2016q3/bin"
+      build_toolchain_directory="$(HomeDir)/gcc-arm-none-eabi-5_4-2016/gcc-arm-none-eabi-5_4-2016q3/bin"
       c_additional_options="-mcpu=$(CoreType);-mfpu=$(FPU);-mfloat-abi=$(FPABI);-ffunction-sections;-fdata-sections -Wall -Wall -Wpointer-arith -Wstrict-prototypes -Wundef  -Wno-write-strings -mthumb -O0 -g -fno-exceptions -Wno-pointer-arith -DNRF52 -DNRF52832 -D__LINT__=0"
       c_user_include_directories=".;../include;../lib;header"
       debug_additional_load_file="recovery/s132_nrf52_3.0.0_softdevice.hex"
