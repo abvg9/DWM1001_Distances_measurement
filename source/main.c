@@ -7,7 +7,7 @@ int dwm_user_start(void) {
  
   // Inicialmente ponemos el nodo como anchor, para que empiecen
   // a escanearse entre ellos.
-  if(!set_node_as_anchor()) {
+  if(!set_node_as_tag()) {
     return -1;
   }
 

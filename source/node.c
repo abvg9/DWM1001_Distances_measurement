@@ -65,6 +65,79 @@ void blink_led(int pin_led, int loops, float seconds) {
 
 }
 
+bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
+
+  if(expected_mode != cfg.mode) {
+    return false;
+  }
+
+  dwm_cfg_tag_t tag_cfg;
+  dwm_cfg_anchor_t anchor_cfg;
+
+  switch(expected_mode) {
+
+    case DWM_MODE_TAG:
+      tag_cfg = default_tag_config();
+
+      if(tag_cfg.stnry_en != cfg.stnry_en) {
+        return false;
+      }
+
+      if(tag_cfg.meas_mode != cfg.meas_mode) {
+        return false;
+      }
+
+      if(tag_cfg.low_power_en != cfg.low_power_en) {
+        return false;
+      }
+
+      if(tag_cfg.loc_engine_en != cfg.loc_engine_en) {
+        return false;
+      }
+
+      break;
+    
+    case DWM_MODE_ANCHOR:
+      anchor_cfg = default_anchor_config();
+
+      if(anchor_cfg.initiator != cfg.initiator) {
+        return false;
+      }
+
+      if(anchor_cfg.bridge != cfg.bridge) {
+        return false;
+      }
+
+    break;   
+
+  }
+
+  // Compare common.
+  dwm_cfg_common_t common_cfg = default_common_config();
+
+  if(cfg.common.ble_en != common_cfg.ble_en) {
+    return false;
+  }
+
+  if(cfg.common.enc_en != common_cfg.enc_en) {
+    return false;
+  }
+
+  if(cfg.common.fw_update_en != common_cfg.fw_update_en) {
+    return false;
+  }
+
+  if(cfg.common.led_en != common_cfg.led_en) {
+    return false;
+  }
+
+  if(cfg.common.uwb_mode != common_cfg.uwb_mode) {
+    return false;
+  }
+
+  return true;
+}
+
 dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_factor) {
 
   dwm_pos_t position;
@@ -74,6 +147,44 @@ dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_facto
   position.qf = quality_factor;
 
   return position;
+}
+
+dwm_cfg_anchor_t default_anchor_config(void) {
+
+  dwm_cfg_anchor_t cfg;
+
+  cfg.initiator = true;
+  cfg.bridge = false;
+  cfg.common = default_common_config();
+
+  return cfg;
+}
+
+dwm_cfg_common_t default_common_config(void) {
+
+  dwm_cfg_common_t cfg;
+
+  cfg.ble_en = false;
+  cfg.enc_en = false;
+  cfg.fw_update_en = true;
+  cfg.led_en = false;
+  cfg.uwb_mode = DWM_UWB_MODE_ACTIVE;
+
+  return cfg;
+}
+
+dwm_cfg_tag_t default_tag_config(void) {
+
+  dwm_cfg_tag_t cfg;
+
+  cfg.stnry_en = true;
+  cfg.meas_mode = DWM_MEAS_MODE_TWR;
+  cfg.low_power_en = false;
+  cfg.loc_engine_en = true;
+
+  cfg.common = default_common_config();
+
+  return cfg;
 }
 
 void dwm_event_callback(dwm_evt_t *p_evt) {
@@ -107,6 +218,15 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
       blink_led(LED_BLUE, 7, 1);
       blink_led(LED_GREEN, 1, 1);
     break;
+  }
+
+  // Send a broadcast message informing that the node is ready.
+  uint8_t len, message[DWM_USR_DATA_LEN_MAX];
+  len = DWM_USR_DATA_LEN_MAX;
+
+  message[0] = 1;
+
+  if(!err_check(dwm_usr_data_write(message, len, true))) {
   }
 
 }
@@ -177,17 +297,10 @@ bool set_node_as_anchor(void) {
     return false;
   }
   
-  if(cfg.mode != DWM_MODE_ANCHOR) {
+  if(!check_configuration(DWM_MODE_ANCHOR, cfg)) {
 
-    dwm_cfg_anchor_t anchor_cfg;
-
-    anchor_cfg.initiator = true;
-    anchor_cfg.bridge = false;
-    anchor_cfg.common.ble_en = false;
-    anchor_cfg.common.led_en = false;
-    anchor_cfg.common.enc_en = false;
-    anchor_cfg.common.fw_update_en = true;
-    anchor_cfg.common.uwb_mode = DWM_UWB_MODE_ACTIVE;
+    dwm_cfg_anchor_t anchor_cfg = default_anchor_config();
+    cfg.mode = DWM_MODE_ANCHOR;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -223,7 +336,7 @@ bool set_node_as_tag(void) {
     return false;
   }
   
-  if(cfg.mode != DWM_MODE_TAG) {
+  if(!check_configuration(DWM_MODE_TAG, cfg)) {
 
     // Update rate set to 1 second, stationary update rate set to 5 seconds.
     if(!err_check(dwm_upd_rate_set(10, 10))) {
@@ -244,17 +357,8 @@ bool set_node_as_tag(void) {
       //return false;
     //}
   
-    dwm_cfg_tag_t tag_cfg;
-
-    tag_cfg.stnry_en = true;
-    tag_cfg.meas_mode = DWM_MEAS_MODE_TDOA;
-    tag_cfg.low_power_en = false;
-    tag_cfg.loc_engine_en = true;
-    tag_cfg.common.ble_en = false;
-    tag_cfg.common.enc_en = false;
-    tag_cfg.common.fw_update_en = false;
-    tag_cfg.common.led_en = false;
-    tag_cfg.common.uwb_mode = DWM_UWB_MODE_ACTIVE;
+    dwm_cfg_tag_t tag_cfg = default_tag_config();
+    cfg.mode = DWM_MODE_TAG;
 
     if(!err_check(dwm_cfg_tag_set(&tag_cfg))) {
       return false;

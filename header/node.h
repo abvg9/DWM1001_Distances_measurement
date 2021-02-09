@@ -56,7 +56,15 @@ void binary_store_neighbor(uint16_t node_id);
 
 void blink_led(int pin_led, int loops, float seconds);
 
+bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg);
+
 dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_factor);
+
+dwm_cfg_anchor_t default_anchor_config(void);
+
+dwm_cfg_common_t default_common_config(void);
+
+dwm_cfg_tag_t default_tag_config(void);
 
 void dwm_anchor_scan_thread(uint32_t data);
 
