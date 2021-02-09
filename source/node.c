@@ -80,32 +80,56 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
 
   switch (p_evt->header.id) {
     case DWM_EVT_LOC_READY:
-      // p_evt->loc.anchors.dist
+      blink_led(LED_BLUE, 1, 1);
       blink_led(LED_GREEN, 1, 1);
     break;
     case DWM_EVT_UWBMAC_JOINED_CHANGED:
-      blink_led(LED_GREEN, 2, 1);
+      blink_led(LED_BLUE, 2, 1);
+      blink_led(LED_GREEN, 1, 1);
     break; 
     case DWM_EVT_BH_INITIALIZED_CHANGED:
-      blink_led(LED_GREEN, 3, 1);
+      blink_led(LED_BLUE, 3, 1);
+      blink_led(LED_GREEN, 1, 1);
     break;
     case DWM_EVT_UWB_SCAN_READY:
-      blink_led(LED_GREEN, 4, 1);
+      blink_led(LED_BLUE, 4, 1);
+      blink_led(LED_GREEN, 1, 1);
     break;
     case DWM_EVT_USR_DATA_READY:
-      blink_led(LED_GREEN, 5, 1);
+      blink_led(LED_BLUE, 5, 1);
+      blink_led(LED_GREEN, 1, 1);
     break;
     case DWM_EVT_USR_DATA_SENT:
-      blink_led(LED_RED1, 6, 1);
+      blink_led(LED_BLUE, 6, 1);
+      blink_led(LED_GREEN, 1, 1);
     break;
     default:
-      blink_led(LED_RED1, 7, 1);
+      blink_led(LED_BLUE, 7, 1);
+      blink_led(LED_GREEN, 1, 1);
     break;
+  }
+
+  // Send a broadcast message informing that the node is ready.
+  uint8_t len, message[DWM_USR_DATA_LEN_MAX];
+  len = DWM_USR_DATA_LEN_MAX;
+
+  message[0] = 1;
+
+  if(!err_check(dwm_usr_data_write(message, len, true))) {
   }
 
 }
 
 void dwm_anchor_scan_thread(uint32_t data) {
+
+  // Initialize neighbors list.
+  uint16_t* id = NULL;
+
+  err_check(dwm_panid_get(id));
+
+  node n = {(uint16_t)*id, 0};
+  neighbors.nodes[0] = n;
+  neighbors.cnt = 1;
 
   dwm_anchor_list_t anchors_list;
   anchors_list.cnt = 0;
@@ -120,36 +144,14 @@ void dwm_anchor_scan_thread(uint32_t data) {
         for(i = 0; i < anchors_list.cnt; ++i) {
           binary_store_neighbor(anchors_list.v[i].node_id);
         }
-
-        //blink_led(LED_GREEN, 1, 1);
-      } else {
-        //blink_led(LED_RED1, 1, 1);
       }
     }
 
   }
 
-  // Send a broadcast message informing that the node is ready.
-  uint8_t len, message[DWM_USR_DATA_LEN_MAX];
-  len = DWM_USR_DATA_LEN_MAX;
-
-  message[0] = 1;
-
-  dwm_usr_data_write(message, len, false);
-
 }
 
 void dwm_event_thread(uint32_t data) {
-
-  /* Update rate set to 1 second, stationary update rate set to 5 seconds */
-  //if(err_check(dwm_upd_rate_set(10, 10))) {
-    //return;
-  //}
-
-  /* Sensitivity for switching between stationary and normal update rate */
-  //if(err_check(dwm_stnry_cfg_set(DWM_STNRY_SENSITIVITY_NORMAL))) {
-    //return;
-  //}
 
   /* Register event callback */
   dwm_evt_listener_register(DWM_EVT_LOC_READY | DWM_EVT_USR_DATA_READY | 
@@ -231,6 +233,25 @@ bool set_node_as_tag(void) {
   }
   
   if(cfg.mode != DWM_MODE_TAG) {
+
+    // Update rate set to 1 second, stationary update rate set to 5 seconds.
+    if(!err_check(dwm_upd_rate_set(10, 10))) {
+      return false;
+    }
+
+    // Sensitivity for switching between stationary and normal update rate.
+    if(!err_check(dwm_stnry_cfg_set(DWM_STNRY_SENSITIVITY_NORMAL))) {
+      return false;
+    }
+
+    //dwm_uwb_cfg_t uwb_cfg;
+    //uwb_cfg.pg_delay = PG_DELAY;
+    //uwb_cfg.tx_power = TX_POWER;
+
+    // Set uwb configuration.
+    //if(!err_check(dwm_uwb_cfg_set(&uwb_cfg))) {
+      //return false;
+    //}
   
     dwm_cfg_tag_t tag_cfg;
 
@@ -245,12 +266,6 @@ bool set_node_as_tag(void) {
     tag_cfg.common.uwb_mode = DWM_UWB_MODE_ACTIVE;
 
     if(!err_check(dwm_cfg_tag_set(&tag_cfg))) {
-      return false;
-    }
-
-     // Set position.
-    dwm_pos_t pos = create_position(0, 0, 0, 100);
-    if(!err_check(dwm_pos_set(&pos))) {
       return false;
     }
 

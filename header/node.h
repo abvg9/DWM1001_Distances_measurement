@@ -17,7 +17,9 @@ typedef struct {
 
 /* VARIABLES */
 rangin_neigbors neighbors;
-#define NET_NUM_NODES 2
+#define NET_NUM_NODES 2 // Without counting this node.
+#define PG_DELAY 197
+#define TX_POWER 0xD0252525
 
 /* I2C */
 #define LIS2DX_SLAVE_ADDR       0x19   /* I2C slave address */

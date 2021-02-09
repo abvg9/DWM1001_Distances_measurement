@@ -2,20 +2,9 @@
 
 int dwm_user_start(void) {
 
-   // Initialize neighbors list.
-  uint64_t id;
-
-  if(!err_check(dwm_node_id_get(&id))) {
-    return -1;
-  }
-
-  node n = {id, 0};
-  neighbors.nodes[0] = n;
-  neighbors.cnt = 1;
- 
   // Eneable localization engine.
   dwm_le_compile();
-
+ 
   // Inicialmente ponemos el nodo como anchor, para que empiecen
   // a escanearse entre ellos.
   if(!set_node_as_anchor()) {

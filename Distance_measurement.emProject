@@ -91,6 +91,7 @@
     arm_target_interface_type="SWD"
     asm_additional_options=""
     build_intermediate_directory="output/compiler"
+    build_intermediate_directory="output/compiler"
     build_output_directory="output/linker"
     build_output_file_name="$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf"
     build_toolchain_directory="/home/developer/gcc-arm-none-eabi-5_4-2016/gcc-arm-none-eabi-5_4-2016q3/bin"
