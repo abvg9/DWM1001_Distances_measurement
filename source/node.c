@@ -109,15 +109,6 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
     break;
   }
 
-  // Send a broadcast message informing that the node is ready.
-  uint8_t len, message[DWM_USR_DATA_LEN_MAX];
-  len = DWM_USR_DATA_LEN_MAX;
-
-  message[0] = 1;
-
-  if(!err_check(dwm_usr_data_write(message, len, true))) {
-  }
-
 }
 
 void dwm_anchor_scan_thread(uint32_t data) {
