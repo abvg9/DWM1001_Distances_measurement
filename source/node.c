@@ -256,7 +256,7 @@ bool set_node_as_tag(void) {
     dwm_cfg_tag_t tag_cfg;
 
     tag_cfg.stnry_en = true;
-    tag_cfg.meas_mode = DWM_MEAS_MODE_TWR;
+    tag_cfg.meas_mode = DWM_MEAS_MODE_TDOA;
     tag_cfg.low_power_en = false;
     tag_cfg.loc_engine_en = true;
     tag_cfg.common.ble_en = false;

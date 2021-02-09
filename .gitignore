@@ -2,8 +2,8 @@
 output/
 
 #Segger configurations
-.emSession
-.jlink
+*.emSession
+*.jlink
 
 # Prerequisites
 *.d
