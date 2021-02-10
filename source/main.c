@@ -3,10 +3,6 @@
 
 int dwm_user_start(void) {
 
-  if(!nvm_load_data()) {
-    return -1;
-  }
-
   // Inicialmente ponemos el nodo como anchor, para que empiecen
   // a escanearse entre ellos.
   if(!set_node_as_anchor()) {

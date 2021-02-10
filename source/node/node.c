@@ -1,6 +1,8 @@
 #include "node.h"
 
-/* Default configurations */
+/*******************************
+ * DEFAULT NODE CONFIGURATIONS *
+ *******************************/
 const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, false, false};
 const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, true, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
@@ -235,15 +237,6 @@ void dwm_event_thread(uint32_t data) {
     }
   }
 
-}
-
-bool err_check(int err_code) {
-
-  if(err_code != DWM_OK) {
-    return false;
-  }
-
-  return true;
 }
 
 bool set_node_as_anchor(void) {

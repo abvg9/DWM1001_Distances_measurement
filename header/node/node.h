@@ -4,7 +4,11 @@
 #include "common.h"
 #include <stdio.h>
 
-/* Functions */
+rangin_neighbors neighbors;
+
+/*************
+ * FUNCTIONS *
+ *************/
 
 int binary_search_neighbor(uint16_t node_id, int left_limit, int right_limit);
 
@@ -21,8 +25,6 @@ void dwm_anchor_scan_thread(uint32_t data);
 void dwm_event_callback(dwm_evt_t *p_evt);
 
 void dwm_event_thread(uint32_t data);
-
-bool err_check(int err_code);
 
 bool set_node_as_anchor(void);
 

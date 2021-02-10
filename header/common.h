@@ -3,10 +3,14 @@
 
 #include "dwm.h"
 
-/* Net */
+/*******
+ * NET *
+ *******/
 #define NET_NUM_NODES 2
 
-/* Leds */
+/********
+ * LEDS *
+ ********/
 #define LED_RED    	 DWM_GPIO_IDX_22
 #define LED_RED1    	 DWM_GPIO_IDX_14
 #define LED_BLUE   	 DWM_GPIO_IDX_31
@@ -14,25 +18,37 @@
 #define LED_ON(led_pin)  dwm_gpio_value_set(led_pin, true)
 #define LED_OFF(led_pin) dwm_gpio_value_set(led_pin, false)
 
-/* Thread priority */
-#ifndef THREAD_PRIO
-#define THREAD_PRIO	20
-#endif /* THREAD_APP_PRIO */
-
-/* Thread stack size */
-#ifndef THREAD_STACK_SIZE
-#define THREAD_STACK_SIZE	(3 * 1024)
-#endif /* THREAD_APP_STACK_SIZE */
+/***********
+ * THREADS *
+ ***********/
+#define THREAD_PRIO       20
+#define THREAD_STACK_SIZE (3 * 1024)
 
 /* Relationship between seconds and system ticks */
 #define ONE_SECOND 100
 
-/* Neigbors */
+/************
+ * NEIGHBORS *
+ ************/
+
 typedef struct {
   int cnt;
   uint16_t node_ids[DWM_RANGING_ANCHOR_CNT_MAX];
-} rangin_neigbors;
+} rangin_neighbors;
 
-rangin_neigbors neighbors;
+/*************
+ * FUNCTIONS *
+ *************/
+
+/**
+ * @brief Check if a dwm api function return a error code or not.
+ *
+ * @param[in] err_code: Return value of a dwm pi function.
+ *
+ * @return bool
+ * @retval true If the return value is not an error code.
+ * @retval false If the return value is an error code.
+ */
+bool err_check(int err_code);
 
 #endif // COMMON

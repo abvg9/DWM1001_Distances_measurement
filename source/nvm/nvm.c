@@ -1,99 +1,74 @@
 #include "nvm.h"
 
-bool first_board_start(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
+bool check_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
-  bool is_the_first_start = true;
+  bool value = true;
   int i;
 
-  for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX && is_the_first_start; ++i) {
-    is_the_first_start *= (nvm[i] == 0);
+  for(i = 0; i < NVM_VARIABLE_SIZE && value; ++i) {
+    value *= (nvm[mp + NVM_TRUE] == 0);
   }
 
-  if(!is_the_first_start) {
-    uint8_t new_nvm[DWM_NVM_USR_DATA_LEN_MAX] = {0};
-    dwm_nvm_usr_data_set(new_nvm, DWM_NVM_USR_DATA_LEN_MAX);
-  }
-
-  return is_the_first_start;
+  return value;
 
 }
 
-bool nvm_load_data(void) {
+bool clean_memory(void) {
+
+  uint8_t clean_nvm[DWM_NVM_USR_DATA_LEN_MAX] = {0};
+
+  return dwm_nvm_usr_data_set(clean_nvm, DWM_NVM_USR_DATA_LEN_MAX);
+}
+
+rangin_neighbors load_neighbors(void) {
 
   uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
-  
+
+  rangin_neighbors neighbors;
+  neighbors.cnt = 0;
+
   if(!err_check(dwm_nvm_usr_data_get(buf, &len))) {
-    return false;
-  }
 
-  dwm_cfg_t cfg;
+    int i;
+    int j;
 
-  if(!err_check(dwm_cfg_get(&cfg))) {
-    return false;
-  }
+    neighbors.cnt = buf[number_of_neighbors];
 
-  // Significa que es el primer inicio de la placa y debemos
-  if(first_board_start(buf)) {
-
-  }
-
-  if(nvm_is_valid(buf)) {
-
-    if(buf[node_type] != cfg.mode) {
-
-      int i;
-      int j;
-      // Una direccion es de 16 bits, y la nvm esta compusta por fragmentos
-      // de 8 bits.
-      for(i = 0, j = 0; i < NET_NUM_NODES*2; i+=2, ++j) {
-        neighbors.node_ids[j] = 
-          ((uint16_t) buf[first_neighbor_id_1 + i + 1] << 8) | buf[first_neighbor_id_1 + i];
-      }
-
+    // An id of a node occupies 16 bits, and the NVM
+    // positions are of 8 bits, so to load
+    // an id, we need to load to positions of the nvm.
+    for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
+      neighbors.node_ids[j] = 
+        ((uint16_t) buf[neighbors_start_address + i + 1] << 8) | buf[neighbors_start_address + i];
     }
-
-  } else {
-    return nvm_validate(buf);
   }
 
-  return true;
+  return neighbors;
 }
 
-bool nvm_store_data(dwm_mode_t node_mode) {
+bool store_neighbors(rangin_neighbors neighbors) {
 
   uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
-  buf[node_type] = node_mode;
+  uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
-  int i;
-  int j;
-  // Una direccion es de 16 bits, y la nvm esta compusta por fragmentos
-  // de 8 bits.
-  for(i = 0, j = 0; i < NET_NUM_NODES*2; i+=2, ++j) {
-    buf[first_neighbor_id_1 + i] = (uint8_t)((neighbors.node_ids[j] & 0XFF00) >> 8);
-    buf[first_neighbor_id_1 + i + 1] = (uint8_t)(neighbors.node_ids[j] & 0X00FF);
+  if(!err_check(dwm_nvm_usr_data_get(buf, &len))) {
+
+    int i;
+    int j;
+
+    buf[number_of_neighbors] = neighbors.cnt;
+
+    // An id of a node occupies 16 bits, and the NVM
+    // positions are of 8 bits, so to load
+    // an id, we need to load to positions of the nvm.
+    for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
+      buf[neighbors_start_address + i] = (uint8_t)((neighbors.node_ids[j] & 0XFF00) >> 8);
+      buf[neighbors_start_address + i + 1] = (uint8_t)(neighbors.node_ids[j] & 0X00FF);
+    }
+
+    return err_check(dwm_nvm_usr_data_set(buf, DWM_NVM_USR_DATA_LEN_MAX));
   }
 
-  return err_check(dwm_nvm_usr_data_set(buf, DWM_NVM_USR_DATA_LEN_MAX));
-}
-
-bool nvm_validate(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
-  
-  int i;
-  for(i = 0; i < NVM_VALIDATION_CNT; ++i) {
-    nvm[nvm_validation_number + i] = NVM_VALIDATION_NUMBER;
-  }
-  
-  return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
-}
-
-bool nvm_is_valid(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
-
-  bool nvm_is_valid = true;
-  int i;
-  for(i = 0; i < NVM_VALIDATION_CNT && nvm_is_valid; ++i) {
-    nvm_is_valid *= (nvm[nvm_validation_number + i] == NVM_VALIDATION_NUMBER);
-  }
-
-  return nvm_is_valid;
+  return false;
 }
