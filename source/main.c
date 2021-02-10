@@ -1,13 +1,15 @@
 #include "node.h"
+#include "nvm.h"
 
 int dwm_user_start(void) {
 
-  // Eneable localization engine.
-  dwm_le_compile();
- 
+  if(!nvm_load_data()) {
+    return -1;
+  }
+
   // Inicialmente ponemos el nodo como anchor, para que empiecen
   // a escanearse entre ellos.
-  if(!set_node_as_tag()) {
+  if(!set_node_as_anchor()) {
     return -1;
   }
 

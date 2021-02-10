@@ -3,11 +3,22 @@
   <project Name="Distance_measurement">
     <folder Name="source">
       <file file_name="source/main.c" />
-      <file file_name="source/node.c" />
+      <folder Name="node">
+        <file file_name="source/node/node.c" />
+      </folder>
+      <folder Name="nvm">
+        <file file_name="source/nvm/nvm.c" />
+      </folder>
     </folder>
     <folder Name="header">
       <file file_name="include/dwm.h" />
-      <file file_name="header/node.h" />
+      <folder Name="node">
+        <file file_name="header/node/node.h" />
+      </folder>
+      <folder Name="nvm">
+        <file file_name="header/nvm/nvm.h" />
+      </folder>
+      <file file_name="header/common.h" />
     </folder>
     <folder Name="internal">
       <file file_name="lib/dwm.o" />
@@ -32,7 +43,7 @@
       build_output_file_name="$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf"
       build_toolchain_directory="$(HomeDir)/gcc-arm-none-eabi-5_4-2016/gcc-arm-none-eabi-5_4-2016q3/bin"
       c_additional_options="-mcpu=$(CoreType);-mfpu=$(FPU);-mfloat-abi=$(FPABI);-ffunction-sections;-fdata-sections -Wall -Wall -Wpointer-arith -Wstrict-prototypes -Wundef  -Wno-write-strings -mthumb -O0 -g -fno-exceptions -Wno-pointer-arith -DNRF52 -DNRF52832 -D__LINT__=0"
-      c_user_include_directories=".;include;lib;header"
+      c_user_include_directories=".;include;lib;header/node;header/nvm;header"
       debug_additional_load_file="recovery/s132_nrf52_3.0.0_softdevice.hex"
       debug_additional_load_file1="recovery/bootloader_s132.bin"
       debug_additional_load_file2="recovery/dwm-core_fw1.bin"
@@ -58,7 +69,7 @@
       external_c_compile_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c &quot;$(RelInputPath)&quot; $(Includes) $(COptions) -o $(TargetPath)"
       external_cpp_compile_command=""
       external_debug_symbols_file_name=""
-      external_link_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -Wl,--gc-sections -Wl,-static -Wl,-n -g -nostdlib -o &quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf&quot; &quot;$(SolutionDir)/output/compiler/main.o&quot; &quot;$(SolutionDir)/output/compiler/node.o&quot; &quot;$(SolutionDir)/lib/dwm.o&quot;  &quot;$(SolutionDir)/lib/libdwm.a&quot; -nostartfiles -L  &quot;$(SolutionDir)/lib&quot; -Wl,-Map,&quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.map&quot; -T &quot;$(SolutionDir)/lib/target_s132_fw2.ld&quot; -lm -lgcc -lc -lnosys"
+      external_link_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -Wl,--gc-sections -Wl,-static -Wl,-n -g -nostdlib -o &quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf&quot; &quot;$(SolutionDir)/output/compiler/main.o&quot; &quot;$(SolutionDir)/output/compiler/node.o&quot; &quot;$(SolutionDir)/output/compiler/nvm.o&quot; &quot;$(SolutionDir)/lib/dwm.o&quot;  &quot;$(SolutionDir)/lib/libdwm.a&quot; -nostartfiles -L  &quot;$(SolutionDir)/lib&quot; -Wl,-Map,&quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.map&quot; -T &quot;$(SolutionDir)/lib/target_s132_fw2.ld&quot; -lm -lgcc -lc -lnosys"
       external_load_address=""
       external_load_file_type="Detect"
       gcc_debugging_level="Level 3"
@@ -91,12 +102,11 @@
     arm_target_interface_type="SWD"
     asm_additional_options=""
     build_intermediate_directory="output/compiler"
-    build_intermediate_directory="output/compiler"
     build_output_directory="output/linker"
     build_output_file_name="$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf"
     build_toolchain_directory="/home/developer/gcc-arm-none-eabi-5_4-2016/gcc-arm-none-eabi-5_4-2016q3/bin"
     c_additional_options="-mcpu=$(CoreType);-mfpu=$(FPU);-mfloat-abi=$(FPABI);-ffunction-sections;-fdata-sections -Wall -Wall -Wpointer-arith -Wstrict-prototypes -Wundef  -Wno-write-strings -mthumb -O0 -g -fno-exceptions -Wno-pointer-arith -DNRF52 -DNRF52832 -D__LINT__=0"
-    c_user_include_directories=".;include;lib;header"
+    c_user_include_directories=".;include;lib;header/node;header/nvm;header"
     debug_additional_load_file="recovery/s132_nrf52_3.0.0_softdevice.hex"
     debug_additional_load_file1="recovery/bootloader_s132.bin"
     debug_additional_load_file2="recovery/dwm-core_fw1.bin"
@@ -122,7 +132,7 @@
     external_c_compile_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -c &quot;$(RelInputPath)&quot; $(Includes) $(COptions) -o $(TargetPath)"
     external_cpp_compile_command=""
     external_debug_symbols_file_name=""
-    external_link_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -Wl,--gc-sections -Wl,-static -Wl,-n -g -nostdlib -o &quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf&quot; &quot;$(SolutionDir)/output/compiler/main.o&quot; &quot;$(SolutionDir)/output/compiler/node.o&quot; &quot;$(SolutionDir)/lib/dwm.o&quot;  &quot;$(SolutionDir)/lib/libdwm.a&quot; -nostartfiles -L  &quot;$(SolutionDir)/lib&quot; -Wl,-Map,&quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.map&quot; -T &quot;$(SolutionDir)/lib/target_s132_fw2.ld&quot; -lm -lgcc -lc -lnosys"
+    external_link_command="&quot;$(ToolChainDir)/arm-none-eabi-gcc&quot; -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -Wl,--gc-sections -Wl,-static -Wl,-n -g -nostdlib -o &quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.elf&quot; &quot;$(SolutionDir)/output/compiler/main.o&quot; &quot;$(SolutionDir)/output/compiler/node.o&quot; &quot;$(SolutionDir)/output/compiler/nvm.o&quot; &quot;$(SolutionDir)/lib/dwm.o&quot;  &quot;$(SolutionDir)/lib/libdwm.a&quot; -nostartfiles -L  &quot;$(SolutionDir)/lib&quot; -Wl,-Map,&quot;$(SolutionDir)/output/linker/$(SolutionName)_fw2.map&quot; -T &quot;$(SolutionDir)/lib/target_s132_fw2.ld&quot; -lm -lgcc -lc -lnosys"
     external_load_address=""
     external_load_file_type="Detect"
     gcc_debugging_level="Level 3"
