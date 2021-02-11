@@ -106,6 +106,12 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
     case DWM_EVT_LOC_READY:
       blink_led_thread(BLUE_LED, 1, 3);
       blink_led_thread(GREEN_LED, 1, 3);
+
+      uint8_t len, data[DWM_USR_DATA_LEN_MAX] = { 0xFF, 0x00, 0XFF };
+      len = 3;
+
+      dwm_usr_data_write(data, len, false);
+
     break;
 
     case DWM_EVT_UWBMAC_JOINED_CHANGED:
@@ -151,6 +157,7 @@ void dwm_anchor_scan_thread(uint32_t data) {
     dwm_anchor_list_t anchors_list;
     anchors_list.cnt = 0;
 
+    // SE VA A QUEDAR ENCERRADO AQUI CUANDO UN NODO SEA TAG
     while(neighbors.cnt != NET_NUM_NODES) {
 
       if(err_check(dwm_anchor_list_get(&anchors_list))) {
