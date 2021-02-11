@@ -41,7 +41,7 @@ typedef struct {
  *************/
 
 /**
- * @brief Check if a dwm api function return a error code or not.
+ * @brief Check if a dwm api function return an error code or not.
  *
  * @param[in] err_code: Return value of a dwm pi function.
  *
@@ -50,5 +50,23 @@ typedef struct {
  * @retval false If the return value is an error code.
  */
 bool err_check(int err_code);
+
+/**
+ * @brief Makes a led blink.
+ *
+ * @note This function only works if called in the context of a thread.
+ * @note If you look at the implementation of the function, a library function
+ *       called dwm_thread_delay is called. This receives an integer and 
+ *       indicates how many ticks we want to remain idle. For this reason,
+ *       when you want to call the blink_led function, be careful with the seconds
+ *       that are passed to it, since c, when casting from float to integer could
+ *       round to 0 and we could not see the led blink.
+ *
+ * @param[in] pin_led: Led gpio pin.
+ * @param[in] loops: Number of times the led will blink.
+ * @param[in] seconds: Number of seconds that the led will be in the on or off state.
+ *
+ */
+void blink_led_thread(int pin_led, int loops, float seconds);
 
 #endif // COMMON

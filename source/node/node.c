@@ -7,71 +7,8 @@ const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, f
 const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, true, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
-int binary_search_neighbor(uint16_t node_id, int left_limit, int right_limit) {
-
-  if(neighbors.cnt == 0) {
-    return -1;
-  }
-
-  int medium = 0;
-
-  while(left_limit <= right_limit) {
-
-    medium = left_limit + (right_limit - left_limit) / 2;
-
-    if(neighbors.node_ids[medium] == node_id) {
-      return medium;
-    }
-
-    if(neighbors.node_ids[medium] < node_id) {
-      left_limit = medium + 1;
-    } else {
-      right_limit = medium - 1;
-    }
-
-  }
-
-  return -1;
-
-}
-
-void binary_store_neighbor(uint16_t node_id) {
-
-  if(neighbors.cnt == 0) {
-    neighbors.node_ids[0] = node_id;
-  } else if(neighbors.cnt < DWM_RANGING_ANCHOR_CNT_MAX
-    && binary_search_neighbor(node_id, 0, neighbors.cnt-1) == -1) {
-
-    int i;
-
-    for(i = neighbors.cnt-1; (i >= 0) && (neighbors.node_ids[i] > node_id); i--) {
-      neighbors.node_ids[i + 1] = neighbors.node_ids[i];
-    }
-
-    neighbors.node_ids[i + 1] = node_id;
-  }
-
-  neighbors.cnt++;
-
-}
-
-void blink_led(int pin_led, int loops, float seconds) {
-
-    // Set as output and turn off the led.
-    dwm_gpio_cfg_output(pin_led, true);
-
-    int i;
-
-    for(i = 0; i < loops; ++i) {
-
-      dwm_gpio_value_set(pin_led, false);
-      dwm_thread_delay(ONE_SECOND*seconds);
-
-      dwm_gpio_value_set(pin_led, true);
-      dwm_thread_delay(ONE_SECOND*seconds);
-    }
-
-}
+bool first_run = true;
+rangin_neighbors neighbors;
 
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
 
@@ -102,10 +39,6 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
       break;
     
     case DWM_MODE_ANCHOR:
-
-      if(default_anchor_cfg.initiator != cfg.initiator) {
-        return false;
-      }
 
       if(default_anchor_cfg.bridge != cfg.bridge) {
         return false;
@@ -139,6 +72,22 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
   return true;
 }
 
+bool cmp_neighbors_lists(rangin_neighbors loaded_neighbors) {
+
+  if(loaded_neighbors.cnt != neighbors.cnt) {
+    return false;
+  }
+
+  int i;
+  bool equal = true;
+
+  for(i = 0; i < loaded_neighbors.cnt && equal; ++i) {
+    equal = (loaded_neighbors.node_ids[i] == neighbors.node_ids[i]);
+  }
+
+  return equal;
+}
+
 dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_factor) {
 
   dwm_pos_t position;
@@ -154,28 +103,16 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
 
   switch (p_evt->header.id) {
     case DWM_EVT_LOC_READY:
-      blink_led(LED_BLUE, 1, 1);
-      blink_led(LED_GREEN, 1, 1);
     break;
     case DWM_EVT_UWBMAC_JOINED_CHANGED:
-      blink_led(LED_BLUE, 2, 1);
-      blink_led(LED_GREEN, 1, 1);
     break; 
     case DWM_EVT_BH_INITIALIZED_CHANGED:
-      blink_led(LED_BLUE, 3, 1);
-      blink_led(LED_GREEN, 1, 1);
     break;
     case DWM_EVT_USR_DATA_READY:
-      blink_led(LED_BLUE, 4, 1);
-      blink_led(LED_GREEN, 1, 1);
     break;
     case DWM_EVT_USR_DATA_SENT:
-      blink_led(LED_BLUE, 5, 1);
-      blink_led(LED_GREEN, 1, 1);
     break;
     default:
-      blink_led(LED_BLUE, 6, 1);
-      blink_led(LED_GREEN, 1, 1);
     break;
   }
 
@@ -183,40 +120,50 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
 
 void dwm_anchor_scan_thread(uint32_t data) {
 
-  // Initialize neighbors list.
   uint16_t* id = NULL;
-
   err_check(dwm_panid_get(id));
-  binary_store_neighbor(*id);
 
-  dwm_anchor_list_t anchors_list;
-  anchors_list.cnt = 0;
+  if(!first_run) {
 
-  while(neighbors.cnt != NET_NUM_NODES) {
+    // Initialize neighbors list.
+    store_neighbor(*id);
 
-    if(err_check(dwm_anchor_list_get(&anchors_list))) {
+    dwm_anchor_list_t anchors_list;
+    anchors_list.cnt = 0;
 
-      if(anchors_list.cnt > 0) {
+    while(neighbors.cnt != NET_NUM_NODES) {
 
-        int i;
-        for(i = 0; i < anchors_list.cnt; ++i) {
-          binary_store_neighbor(anchors_list.v[i].node_id);
+      if(err_check(dwm_anchor_list_get(&anchors_list))) {
+
+        if(anchors_list.cnt > 0) {
+
+          int i;
+          for(i = 0; i < anchors_list.cnt; ++i) {
+            store_neighbor(anchors_list.v[i].node_id);
+          }
         }
       }
+
     }
 
+  } else {
+    neighbors = load_neighbors();
   }
 
-  // Si soy el primero, seré el tag.
-  if(neighbors.node_ids[0] == *id) {
+  /* TODO */
+  if(id == 0) {
     
     // HAY QUE GUARDAR COSAS EN LA NVM PARA:
     // -1 CUANDO VUELVA AL DWM_USER_START NO VUELVA A SER ANCHOR
     // -2 GUARDAR LA LISTA DE VECINOS ENCONTRADOS.
-    if(nvm_store_data(DWM_MODE_ANCHOR)) {
+    if(first_run) {
+      store_neighbors(neighbors);
+    } else {
       set_node_as_tag();
     }
 
+  } else if(neighbors.node_ids[1] == 0) {
+    // soy el initiator
   }
 
 }
@@ -239,7 +186,35 @@ void dwm_event_thread(uint32_t data) {
 
 }
 
-bool set_node_as_anchor(void) {
+bool is_there_neighbor(uint16_t node_id) {
+
+  if(neighbors.cnt == 0) {
+    return false;
+  }
+
+  int medium = 0, left_limit = 0, right_limit = 0;
+
+  while(left_limit <= right_limit) {
+
+    medium = left_limit + (right_limit - left_limit) / 2;
+
+    if(neighbors.node_ids[medium] == node_id) {
+      return true;
+    }
+
+    if(neighbors.node_ids[medium] < node_id) {
+      left_limit = medium + 1;
+    } else {
+      right_limit = medium - 1;
+    }
+
+  }
+
+  return false;
+
+}
+
+bool set_node_as_anchor(bool initiator) {
 
   dwm_cfg_t cfg;
 
@@ -250,6 +225,7 @@ bool set_node_as_anchor(void) {
   if(!check_configuration(DWM_MODE_ANCHOR, cfg)) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
+    anchor_cfg.initiator = initiator;
     anchor_cfg.common = default_common_cfg;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
@@ -271,6 +247,7 @@ bool set_node_as_anchor(void) {
       }
     }
 
+    // To apply changes we need to reset the board.
     dwm_reset();
 
   }
@@ -305,14 +282,31 @@ bool set_node_as_tag(void) {
       return false;
     }
 
+    // To apply changes we need to reset the board.
     dwm_reset();
 
   }
-
-  // AQUI DEBERIAMOS AVISAR AL SIGUIENTE NODO DE QUE EL ES EL INITIATOR
   
   return true;
 }
 
+void store_neighbor(uint16_t node_id) {
 
+  if(neighbors.cnt == 0) {
 
+    neighbors.node_ids[0] = node_id;
+    neighbors.cnt++;
+
+  } else if(neighbors.cnt < DWM_RANGING_ANCHOR_CNT_MAX && !is_there_neighbor(node_id)) {
+
+    int i;
+
+    for(i = neighbors.cnt-1; (i >= 0) && (neighbors.node_ids[i] > node_id); i--) {
+      neighbors.node_ids[i + 1] = neighbors.node_ids[i];
+    }
+
+    neighbors.node_ids[i + 1] = node_id;
+    neighbors.cnt++;
+  }
+
+}
