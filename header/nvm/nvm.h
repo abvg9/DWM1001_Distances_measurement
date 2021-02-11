@@ -6,14 +6,7 @@
 /***************
  * DEFINITIONS *
  ***************/
-
 #define NVM_VARIABLE_SIZE 2
-
-/****************************************
- * NVM POSIBLE BOOLEAN VARIABLES VALUES *
- ****************************************/
-#define NVM_TRUE 0X00
-#define NVM_FALSE 0X01
 
 /*********
  * ENUMS *
@@ -32,16 +25,8 @@ typedef enum {
  * FUNCTIONS *
  *************/
 
-/**
- * @brief Set zeros in all the positions of the NVM.
- *
- * @param[out] buf: The non volatile memory cleaned and ready to use.
- *
- * @return bool.
- * @retval true Success.
- * @retval false Can not write in nvm.
- */
-bool clean_memory(uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX]);
+// FUNCION auxiliar QUE HAY QUE QUITAR!
+void llena_de_unos(void);
 
 /**
  * @brief Check if some boolean variable of the NVM is true or false.
@@ -56,6 +41,27 @@ bool clean_memory(uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX]);
 bool check_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]);
 
 /**
+ * @brief Prepare NVM to have the correct format.
+ *
+ * @param[out] nvm: The non volatile memory cleaned and ready to use.
+ *
+ * @return bool.
+ * @retval true Success.
+ * @retval false Can not write in nvm.
+ */
+bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]);
+
+/**
+ * @brief Get a uint8 value of the NVM.
+ *
+ * @param[in] mp: Position of the variable in the nvm.
+ *
+ * @return uint8_t
+ * @retval Value of the variable.
+ */
+uint8_t get_nvm_uint8_variable(nvm_memory_position mp);
+
+/**
  * @brief Load and return a list of the neighbors stored in the nvm.
  *
  * @return rangin_neighbors
@@ -66,7 +72,6 @@ rangin_neighbors load_neighbors(void);
 /**
  * @brief Set a value to a boolean variable of the NVM.
  *
- * @param[in] nvm: The non volatile memory of the board.
  * @param[in] mp: Position of the variable in the nvm.
  * @param[in] value: Value to set.
  *
@@ -74,7 +79,19 @@ rangin_neighbors load_neighbors(void);
  * @retval true If variable was modified correctly.
  * @retval false If variable was not modified correctly.
  */
-bool set_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX], bool value);
+bool set_nvm_boolean_variable(nvm_memory_position mp, bool value);
+
+/**
+ * @brief Set a value to a uint8 variable of the NVM.
+ *
+ * @param[in] mp: Position of the variable in the nvm.
+ * @param[in] value: Value to set.
+ *
+ * @return bool
+ * @retval true If variable was modified correctly.
+ * @retval false If variable was not modified correctly.
+ */
+bool set_nvm_uint8_variable(nvm_memory_position mp, int value);
 
 /**
  * @brief Store a list of neighbors in the nvm.

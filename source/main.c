@@ -5,12 +5,14 @@ extern bool first_run;
 
 int dwm_user_start(void) {
 
+  //llena_de_unos();
+
   uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
-  if(!err_check(dwm_nvm_usr_data_get(buf, &len))) {
+  if(err_check(dwm_nvm_usr_data_get(buf, &len))) {
 
-    if(check_nvm_boolean_variable(valid_NVM, buf)) {
+    if(!check_nvm_boolean_variable(valid_NVM, buf)) {
 
       if(!clean_memory(buf)) {
         return -1;

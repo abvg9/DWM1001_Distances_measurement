@@ -1,76 +1,124 @@
 #include "nvm.h"
 
+void llena_de_unos(void) {
+
+  uint8_t clean_nvm[DWM_NVM_USR_DATA_LEN_MAX];
+  
+  int i;
+  for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX; ++i) {
+    clean_nvm[i] = 0xFF;
+  }
+
+  dwm_nvm_usr_data_set(clean_nvm, DWM_NVM_USR_DATA_LEN_MAX);
+
+}
+
 bool check_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
   bool value = true;
   int i;
 
   for(i = 0; i < NVM_VARIABLE_SIZE && value; ++i) {
-    value = (nvm[mp + i] == 0);
+    value = (nvm[mp + i] == true);
   }
 
   return value;
 
 }
 
-bool clean_memory(uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX]) {
-
-  uint8_t clean_nvm[DWM_NVM_USR_DATA_LEN_MAX] = {0};
+bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
   int i;
-
-  for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
-    clean_nvm[valid_NVM + i] = NVM_TRUE;
+  for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX; ++i) {
+    nvm[i] = 0x00;
   }
 
   for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
-    clean_nvm[mode + i] = DWM_MODE_TAG;
+    nvm[valid_NVM + i] = true;
   }
 
-  clean_nvm[initiator] = NVM_FALSE;
-  clean_nvm[number_of_scanned_neighbors] = 0;
-  clean_nvm[tag_index] = 0;
-  clean_nvm[initiator_index] = 1;
+  for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
+    nvm[mode + i] = DWM_MODE_ANCHOR;
+  }
 
-  buf = clean_nvm;
+  for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
+    nvm[initiator + i] = false;
+  }
 
-  return dwm_nvm_usr_data_set(clean_nvm, DWM_NVM_USR_DATA_LEN_MAX);
+  nvm[number_of_scanned_neighbors] = 0;
+  nvm[tag_index] = 0;
+  nvm[initiator_index] = 1;
+
+  return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
+}
+
+uint8_t get_nvm_uint8_variable(nvm_memory_position mp) {
+
+  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
+  uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
+
+  if(!err_check(dwm_nvm_usr_data_get(nvm, &len))) {
+    return nvm[mp];
+  }
+
+  return -1;
 }
 
 rangin_neighbors load_neighbors(void) {
 
-  uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
+  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
   rangin_neighbors neighbors;
   neighbors.cnt = 0;
 
-  if(!err_check(dwm_nvm_usr_data_get(buf, &len))) {
+  if(err_check(dwm_nvm_usr_data_get(nvm, &len))) {
 
     int i;
     int j;
 
-    neighbors.cnt = buf[number_of_scanned_neighbors];
+    neighbors.cnt = nvm[number_of_scanned_neighbors];
 
     // An id of a node occupies 16 bits, and the NVM
     // positions are of 8 bits, so to load
     // an id, we need to load to positions of the nvm.
     for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
       neighbors.node_ids[j] = 
-        ((uint16_t) buf[neighbors_start_address + i + 1] << 8) | buf[neighbors_start_address + i];
+        ((uint16_t) nvm[neighbors_start_address + i + 1] << 8) | nvm[neighbors_start_address + i];
     }
   }
 
   return neighbors;
 }
 
-bool set_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX], bool value) {
+bool set_nvm_boolean_variable(nvm_memory_position mp, bool value) {
  
-  int val = value ? NVM_TRUE : NVM_FALSE;
+  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
+  uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
-  int i;
-  for(i = 0; i < NVM_VARIABLE_SIZE && value; ++i) {
-    nvm[mp + i] = val;
+  if(err_check(dwm_nvm_usr_data_get(nvm, &len))) {
+
+    int i;
+    for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
+      nvm[mp + i] = value;
+    }
+
+  } else {
+    return false;
+  }
+
+  return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
+}
+
+bool set_nvm_uint8_variable(nvm_memory_position mp, int value) {
+  
+  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
+  uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
+
+  if(!err_check(dwm_nvm_usr_data_get(nvm, &len))) {
+    nvm[mp] = value;
+  } else {
+    return false;
   }
 
   return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
@@ -78,25 +126,25 @@ bool set_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DA
 
 bool store_neighbors(rangin_neighbors neighbors) {
 
-  uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
+  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
-  if(!err_check(dwm_nvm_usr_data_get(buf, &len))) {
+  if(!err_check(dwm_nvm_usr_data_get(nvm, &len))) {
 
     int i;
     int j;
 
-    buf[number_of_scanned_neighbors] = neighbors.cnt;
+    nvm[number_of_scanned_neighbors] = neighbors.cnt;
 
     // An id of a node occupies 16 bits, and the NVM
     // positions are of 8 bits, so to load
     // an id, we need to load to positions of the nvm.
     for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
-      buf[neighbors_start_address + i] = (uint8_t)((neighbors.node_ids[j] & 0XFF00) >> 8);
-      buf[neighbors_start_address + i + 1] = (uint8_t)(neighbors.node_ids[j] & 0X00FF);
+      nvm[neighbors_start_address + i] = (uint8_t)((neighbors.node_ids[j] & 0XFF00) >> 8);
+      nvm[neighbors_start_address + i + 1] = (uint8_t)(neighbors.node_ids[j] & 0X00FF);
     }
 
-    return err_check(dwm_nvm_usr_data_set(buf, DWM_NVM_USR_DATA_LEN_MAX));
+    return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
   }
 
   return false;

@@ -11,10 +11,10 @@
 /********
  * LEDS *
  ********/
-#define LED_RED    	 DWM_GPIO_IDX_22
-#define LED_RED1    	 DWM_GPIO_IDX_14
-#define LED_BLUE   	 DWM_GPIO_IDX_31
-#define LED_GREEN  	 DWM_GPIO_IDX_30
+#define RED_LED    	 DWM_GPIO_IDX_22
+#define RED1_LED         DWM_GPIO_IDX_14
+#define BLUE_LED   	 DWM_GPIO_IDX_31
+#define GREEN_LED  	 DWM_GPIO_IDX_30
 #define LED_ON(led_pin)  dwm_gpio_value_set(led_pin, true)
 #define LED_OFF(led_pin) dwm_gpio_value_set(led_pin, false)
 

@@ -102,17 +102,37 @@ dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_facto
 void dwm_event_callback(dwm_evt_t *p_evt) {
 
   switch (p_evt->header.id) {
+
     case DWM_EVT_LOC_READY:
+      blink_led_thread(BLUE_LED, 1, 3);
+      blink_led_thread(GREEN_LED, 1, 3);
     break;
+
     case DWM_EVT_UWBMAC_JOINED_CHANGED:
+      blink_led_thread(BLUE_LED, 2, 3);
+      blink_led_thread(GREEN_LED, 1, 3);
     break; 
+
     case DWM_EVT_BH_INITIALIZED_CHANGED:
+      blink_led_thread(BLUE_LED, 3, 3);
+      blink_led_thread(GREEN_LED, 1, 3);
     break;
+
     case DWM_EVT_USR_DATA_READY:
+      blink_led_thread(BLUE_LED, 4, 3);
+      blink_led_thread(GREEN_LED, 1, 3);
+      // Si salta este sería la clave.
+      // p_evt->usr_data[i]
     break;
+
     case DWM_EVT_USR_DATA_SENT:
+      blink_led_thread(BLUE_LED, 5, 3);
+      blink_led_thread(GREEN_LED, 1, 3);
     break;
+
     default:
+      blink_led_thread(BLUE_LED, 6, 3);
+      blink_led_thread(GREEN_LED, 1, 3);
     break;
   }
 
@@ -150,20 +170,18 @@ void dwm_anchor_scan_thread(uint32_t data) {
     neighbors = load_neighbors();
   }
 
-  /* TODO */
-  if(id == 0) {
+  if(*id == get_nvm_uint8_variable(tag_index)) {
     
-    // HAY QUE GUARDAR COSAS EN LA NVM PARA:
-    // -1 CUANDO VUELVA AL DWM_USER_START NO VUELVA A SER ANCHOR
-    // -2 GUARDAR LA LISTA DE VECINOS ENCONTRADOS.
     if(first_run) {
       store_neighbors(neighbors);
-    } else {
-      set_node_as_tag();
     }
 
-  } else if(neighbors.node_ids[1] == 0) {
-    // soy el initiator
+    set_nvm_boolean_variable(mode, DWM_MODE_TAG);
+    set_node_as_tag();
+    
+  } else if(*id == get_nvm_uint8_variable(initiator_index)) {
+    // soy el initiator.
+    set_node_as_anchor(true);
   }
 
 }
@@ -172,8 +190,7 @@ void dwm_event_thread(uint32_t data) {
 
   /* Register event callback */
   dwm_evt_listener_register(DWM_EVT_LOC_READY | DWM_EVT_USR_DATA_READY | 
-    DWM_EVT_USR_DATA_SENT | DWM_EVT_BH_INITIALIZED_CHANGED
-    | DWM_EVT_UWBMAC_JOINED_CHANGED, NULL);
+    DWM_EVT_USR_DATA_SENT | DWM_EVT_BH_INITIALIZED_CHANGED | DWM_EVT_UWBMAC_JOINED_CHANGED, NULL);
 
   dwm_evt_t evt;
 
