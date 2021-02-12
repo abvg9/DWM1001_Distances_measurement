@@ -13,13 +13,13 @@ void llena_de_unos(void) {
 
 }
 
-bool check_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
+bool check_nvm_validity(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
   bool value = true;
   int i;
 
-  for(i = 0; i < NVM_VARIABLE_SIZE && value; ++i) {
-    value = (nvm[mp + i] == true);
+  for(i = 0; i < NVM_VALID_VARIABLE_SIZE && value; ++i) {
+    value = (nvm[valid_NVM + i] == VALID_VALUE);
   }
 
   return value;
@@ -28,21 +28,15 @@ bool check_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_
 
 bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
+  // Put zeros in all the positions.
   int i;
   for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX; ++i) {
     nvm[i] = 0x00;
   }
 
-  for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
+  // Make the NVM valid.
+  for(i = 0; i < NVM_VALID_VARIABLE_SIZE; ++i) {
     nvm[valid_NVM + i] = true;
-  }
-
-  for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
-    nvm[mode + i] = DWM_MODE_ANCHOR;
-  }
-
-  for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
-    nvm[initiator + i] = false;
   }
 
   nvm[number_of_scanned_neighbors] = 0;
@@ -89,25 +83,6 @@ rangin_neighbors load_neighbors(void) {
   }
 
   return neighbors;
-}
-
-bool set_nvm_boolean_variable(nvm_memory_position mp, bool value) {
- 
-  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
-  uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
-
-  if(err_check(dwm_nvm_usr_data_get(nvm, &len))) {
-
-    int i;
-    for(i = 0; i < NVM_VARIABLE_SIZE; ++i) {
-      nvm[mp + i] = value;
-    }
-
-  } else {
-    return false;
-  }
-
-  return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
 }
 
 bool set_nvm_uint8_variable(nvm_memory_position mp, int value) {

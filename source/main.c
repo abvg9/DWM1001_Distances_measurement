@@ -1,18 +1,22 @@
 #include "node.h"
 #include "nvm.h"
 
-extern bool first_run;
+bool first_run = true;
+uint16_t* node_id = NULL;
 
 int dwm_user_start(void) {
 
   //llena_de_unos();
+  // AQUI SE DEBE LLAMAR A UNA FUNCIÓN QUE LEA SI
+  // QUE DEBE EJECUTAR, SI LIMPIEZA DE MEMORIA
+  // O EL PROGRAMA PRINCIPAL.
 
   uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
   if(err_check(dwm_nvm_usr_data_get(buf, &len))) {
 
-    if(!check_nvm_boolean_variable(valid_NVM, buf)) {
+    if(!check_nvm_validity(buf)) {
 
       if(!clean_memory(buf)) {
         return -1;
@@ -26,11 +30,19 @@ int dwm_user_start(void) {
     return -1;
   }
 
-  // Check nmv and see what configuration must have the node.
-  if(check_nvm_boolean_variable(mode, buf) == DWM_MODE_ANCHOR) {
+  if(!err_check(dwm_panid_get(node_id))) {
+    return -1;
+  }
 
-    // Check if the anchor must be the initiator.
-    if(check_nvm_boolean_variable(initiator, buf)) {
+  if(*node_id == get_nvm_uint8_variable(tag_index)) {
+
+    if(!set_node_as_tag()) {
+      return -1;
+    }
+
+  } else {
+
+    if(*node_id == get_nvm_uint8_variable(initiator_index)) {
 
       if(!set_node_as_anchor(true)) {
         return -1;
@@ -53,12 +65,6 @@ int dwm_user_start(void) {
     }
 
     if(!err_check(dwm_thread_resume(scan_hndl))) {
-      return -1;
-    }
-
-  } else if(check_nvm_boolean_variable(mode, buf) == DWM_MODE_TAG) {
-
-    if(!set_node_as_tag()) {
       return -1;
     }
 

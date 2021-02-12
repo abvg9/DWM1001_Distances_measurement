@@ -43,11 +43,11 @@ void dwm_event_thread(uint32_t data);
  *
  * @param[in] node_id: Id to search.
  *
- * @return bool
- * @retval true If node_id is inside neighbors list.
- * @retval false If node_id is not inside neighbors list.
+ * @return int
+ * @retval >= 0 If node_id is inside neighbors list.
+ * @retval -1  If node_id is not inside neighbors list.
  */
-bool is_there_neighbor(uint16_t node_id);
+int is_there_neighbor(uint16_t node_id);
 
 /**
  * @brief Set anchor configuration to the node.

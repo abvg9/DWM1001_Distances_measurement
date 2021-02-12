@@ -7,7 +7,8 @@ const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, f
 const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, true, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
-bool first_run = true;
+extern uint16_t* node_id;
+extern bool first_run;
 rangin_neighbors neighbors;
 
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
@@ -111,6 +112,7 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
       len = 3;
 
       dwm_usr_data_write(data, len, false);
+      // dwm_reset();
 
     break;
 
@@ -129,6 +131,7 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
       blink_led_thread(GREEN_LED, 1, 3);
       // Si salta este sería la clave.
       // p_evt->usr_data[i]
+      // dwm_reset();
     break;
 
     case DWM_EVT_USR_DATA_SENT:
@@ -146,13 +149,10 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
 
 void dwm_anchor_scan_thread(uint32_t data) {
 
-  uint16_t* id = NULL;
-  err_check(dwm_panid_get(id));
-
-  if(!first_run) {
+  if(first_run) {
 
     // Initialize neighbors list.
-    store_neighbor(*id);
+    store_neighbor(*node_id);
 
     dwm_anchor_list_t anchors_list;
     anchors_list.cnt = 0;
@@ -173,22 +173,11 @@ void dwm_anchor_scan_thread(uint32_t data) {
 
     }
 
+    store_neighbors(neighbors);
+    dwm_reset();
+    
   } else {
     neighbors = load_neighbors();
-  }
-
-  if(*id == get_nvm_uint8_variable(tag_index)) {
-    
-    if(first_run) {
-      store_neighbors(neighbors);
-    }
-
-    set_nvm_boolean_variable(mode, DWM_MODE_TAG);
-    set_node_as_tag();
-    
-  } else if(*id == get_nvm_uint8_variable(initiator_index)) {
-    // soy el initiator.
-    set_node_as_anchor(true);
   }
 
 }
@@ -210,10 +199,10 @@ void dwm_event_thread(uint32_t data) {
 
 }
 
-bool is_there_neighbor(uint16_t node_id) {
+int is_there_neighbor(uint16_t node_id) {
 
   if(neighbors.cnt == 0) {
-    return false;
+    return -1;
   }
 
   int medium = 0, left_limit = 0, right_limit = 0;
@@ -223,7 +212,7 @@ bool is_there_neighbor(uint16_t node_id) {
     medium = left_limit + (right_limit - left_limit) / 2;
 
     if(neighbors.node_ids[medium] == node_id) {
-      return true;
+      return medium;
     }
 
     if(neighbors.node_ids[medium] < node_id) {
@@ -234,7 +223,7 @@ bool is_there_neighbor(uint16_t node_id) {
 
   }
 
-  return false;
+  return -1;
 
 }
 
@@ -321,7 +310,8 @@ void store_neighbor(uint16_t node_id) {
     neighbors.node_ids[0] = node_id;
     neighbors.cnt++;
 
-  } else if(neighbors.cnt < DWM_RANGING_ANCHOR_CNT_MAX && !is_there_neighbor(node_id)) {
+  } else if(neighbors.cnt < DWM_RANGING_ANCHOR_CNT_MAX && 
+            is_there_neighbor(node_id) == -1) {
 
     int i;
 

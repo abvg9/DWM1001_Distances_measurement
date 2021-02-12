@@ -6,19 +6,18 @@
 /***************
  * DEFINITIONS *
  ***************/
-#define NVM_VARIABLE_SIZE 2
+#define NVM_VALID_VARIABLE_SIZE 3
+#define VALID_VALUE 0XFF
 
 /*********
  * ENUMS *
  *********/
 typedef enum {
   valid_NVM = 0, // Indicates if the nvm has a valid configuration.
-  mode = valid_NVM + NVM_VARIABLE_SIZE, // Indicates in wich mode the node should operate.
-  initiator = mode + NVM_VARIABLE_SIZE, // Indicate if the anchor must be initiator.
-  number_of_scanned_neighbors = initiator + NVM_VARIABLE_SIZE, // Number of sanned neighbors.
+  number_of_scanned_neighbors = valid_NVM + NVM_VALID_VARIABLE_SIZE, // Number of sanned neighbors.
   tag_index = number_of_scanned_neighbors + 1, // Index of node must be a tag.
   initiator_index = tag_index + 1, // Index of the node must be a initiator
-  neighbors_start_address = number_of_scanned_neighbors + 1 // Initial address of the neighbors.
+  neighbors_start_address = initiator_index + 1 // Initial address of the neighbors.
 } nvm_memory_position;
 
 /*************
@@ -29,16 +28,15 @@ typedef enum {
 void llena_de_unos(void);
 
 /**
- * @brief Check if some boolean variable of the NVM is true or false.
+ * @brief Check if the NVM is valid.
  *
  * @param[in] nvm: The non volatile memory of the board.
- * @param[in] mp: Position of the variable in the nvm.
  *
  * @return bool
- * @retval true If variable is true.
- * @retval false If variable is false.
+ * @retval true If NVM is valid.
+ * @retval false If NVM is not valid.
  */
-bool check_nvm_boolean_variable(nvm_memory_position mp, uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]);
+bool check_nvm_validity(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]);
 
 /**
  * @brief Prepare NVM to have the correct format.
@@ -68,18 +66,6 @@ uint8_t get_nvm_uint8_variable(nvm_memory_position mp);
  * @retval List of the neighbors stored in the nvm.
  */
 rangin_neighbors load_neighbors(void);
-
-/**
- * @brief Set a value to a boolean variable of the NVM.
- *
- * @param[in] mp: Position of the variable in the nvm.
- * @param[in] value: Value to set.
- *
- * @return bool
- * @retval true If variable was modified correctly.
- * @retval false If variable was not modified correctly.
- */
-bool set_nvm_boolean_variable(nvm_memory_position mp, bool value);
 
 /**
  * @brief Set a value to a uint8 variable of the NVM.
