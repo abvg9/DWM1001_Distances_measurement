@@ -66,9 +66,11 @@ bool set_node_as_anchor(bool initiator);
  *
  * @return bool
  * @retval true If the node could be configured as tag.
- * @retval false If the node could not be configured as tag.
+ * @retval false If the node could not be configured as tag.s
  */
 bool set_node_as_tag(void);
+
+bool set_node_mode(bool first_run);
 
 /**
  * @brief Store id in the list of neighbors.

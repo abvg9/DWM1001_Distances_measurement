@@ -1,18 +1,5 @@
 #include "nvm.h"
 
-void llena_de_unos(void) {
-
-  uint8_t clean_nvm[DWM_NVM_USR_DATA_LEN_MAX];
-  
-  int i;
-  for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX; ++i) {
-    clean_nvm[i] = 0xFF;
-  }
-
-  dwm_nvm_usr_data_set(clean_nvm, DWM_NVM_USR_DATA_LEN_MAX);
-
-}
-
 bool check_nvm_validity(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
   bool value = true;
@@ -28,15 +15,13 @@ bool check_nvm_validity(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
 bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
-  // Put zeros in all the positions.
-  int i;
-  for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX; ++i) {
-    nvm[i] = 0x00;
-  }
+  // Put zeros in all the positions of the NVM.
+  set_zeros_nvm();
 
   // Make the NVM valid.
+  int i;
   for(i = 0; i < NVM_VALID_VARIABLE_SIZE; ++i) {
-    nvm[valid_NVM + i] = true;
+    nvm[valid_NVM + i] = VALID_VALUE;
   }
 
   nvm[number_of_scanned_neighbors] = 0;
@@ -73,6 +58,11 @@ rangin_neighbors load_neighbors(void) {
 
     neighbors.cnt = nvm[number_of_scanned_neighbors];
 
+    // Invalid memory read.
+    if(neighbors.cnt > NET_NUM_NODES || neighbors.cnt < 0) {
+      neighbors.cnt = 0;
+    }
+
     // An id of a node occupies 16 bits, and the NVM
     // positions are of 8 bits, so to load
     // an id, we need to load to positions of the nvm.
@@ -97,6 +87,19 @@ bool set_nvm_uint8_variable(nvm_memory_position mp, int value) {
   }
 
   return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
+}
+
+void set_zeros_nvm(void) {
+
+  uint8_t clean_nvm[DWM_NVM_USR_DATA_LEN_MAX];
+  
+  int i;
+  for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX; ++i) {
+    clean_nvm[i] = 0x00;
+  }
+
+  dwm_nvm_usr_data_set(clean_nvm, DWM_NVM_USR_DATA_LEN_MAX);
+
 }
 
 bool store_neighbors(rangin_neighbors neighbors) {

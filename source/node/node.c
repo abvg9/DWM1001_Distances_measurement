@@ -7,9 +7,7 @@ const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, f
 const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, true, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
-extern uint16_t* node_id;
-extern bool first_run;
-rangin_neighbors neighbors;
+extern rangin_neighbors neighbors;
 
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
 
@@ -149,36 +147,34 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
 
 void dwm_anchor_scan_thread(uint32_t data) {
 
-  if(first_run) {
+  // Initialize neighbors list.
+  uint16_t* node_id;
 
-    // Initialize neighbors list.
-    store_neighbor(*node_id);
+  if(!err_check(dwm_panid_get(node_id))) {
+    return false;
+  }
+  store_neighbor(*node_id);
 
-    dwm_anchor_list_t anchors_list;
-    anchors_list.cnt = 0;
+  dwm_anchor_list_t anchors_list;
+  anchors_list.cnt = 0;
 
-    // SE VA A QUEDAR ENCERRADO AQUI CUANDO UN NODO SEA TAG
-    while(neighbors.cnt != NET_NUM_NODES) {
+  while(neighbors.cnt != NET_NUM_NODES) {
 
-      if(err_check(dwm_anchor_list_get(&anchors_list))) {
+    if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
-        if(anchors_list.cnt > 0) {
+      if(anchors_list.cnt > 0) {
 
-          int i;
-          for(i = 0; i < anchors_list.cnt; ++i) {
-            store_neighbor(anchors_list.v[i].node_id);
-          }
+        int i;
+        for(i = 0; i < anchors_list.cnt; ++i) {
+          store_neighbor(anchors_list.v[i].node_id);
         }
       }
-
     }
 
-    store_neighbors(neighbors);
-    dwm_reset();
-    
-  } else {
-    neighbors = load_neighbors();
   }
+
+  store_neighbors(neighbors);
+  dwm_reset();
 
 }
 
@@ -301,6 +297,44 @@ bool set_node_as_tag(void) {
   }
   
   return true;
+}
+
+bool set_node_mode(bool first_run) {
+
+  uint16_t* node_id;
+
+  if(!err_check(dwm_panid_get(node_id))) {
+    return false;
+  }
+
+  int index = is_there_neighbor(*node_id);
+
+  if(index == get_nvm_uint8_variable(tag_index) && !first_run) {
+
+    if(!set_node_as_tag()) {
+      return false;
+    }
+
+  } else {
+
+    if(index == get_nvm_uint8_variable(initiator_index)  && !first_run) {
+
+      if(!set_node_as_anchor(true)) {
+        return false;
+      }
+
+    } else {
+
+      if(!set_node_as_anchor(false)) {
+        return false;
+      }
+
+    }
+
+  }
+
+  return true;
+
 }
 
 void store_neighbor(uint16_t node_id) {

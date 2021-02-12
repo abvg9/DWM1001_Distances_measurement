@@ -2,11 +2,11 @@
 #include "nvm.h"
 
 bool first_run = true;
-uint16_t* node_id = NULL;
+rangin_neighbors neighbors;
 
 int dwm_user_start(void) {
 
-  //llena_de_unos();
+  //set_zeros_nvm();
   // AQUI SE DEBE LLAMAR A UNA FUNCIÓN QUE LEA SI
   // QUE DEBE EJECUTAR, SI LIMPIEZA DE MEMORIA
   // O EL PROGRAMA PRINCIPAL.
@@ -24,38 +24,18 @@ int dwm_user_start(void) {
 
     } else {
       first_run = false;
+      neighbors = load_neighbors();
     }
 
   } else {
     return -1;
   }
 
-  if(!err_check(dwm_panid_get(node_id))) {
-    return -1;
+  if(!set_node_mode(first_run)) {
+    return false;
   }
 
-  if(*node_id == get_nvm_uint8_variable(tag_index)) {
-
-    if(!set_node_as_tag()) {
-      return -1;
-    }
-
-  } else {
-
-    if(*node_id == get_nvm_uint8_variable(initiator_index)) {
-
-      if(!set_node_as_anchor(true)) {
-        return -1;
-      }
-
-    } else {
-
-      if(!set_node_as_anchor(false)) {
-        return -1;
-      }
-
-    }
-
+  if(first_run || neighbors.cnt == 0) {
     // Scan thread
     uint8_t scan_hndl;
 
@@ -68,19 +48,18 @@ int dwm_user_start(void) {
       return -1;
     }
 
-  }
+  } else {
+    // Event thread
+    uint8_t event_hndl;
 
-  // Event thread
+    if(!err_check(dwm_thread_create(THREAD_PRIO, dwm_event_thread, (void*)NULL,
+                    "Event_handler", THREAD_STACK_SIZE, &event_hndl))) {
+      return -1;
+    }
 
-  uint8_t event_hndl;
-
-  if(!err_check(dwm_thread_create(THREAD_PRIO, dwm_event_thread, (void*)NULL,
-                  "Event_handler", THREAD_STACK_SIZE, &event_hndl))) {
-    return -1;
-  }
-
-  if(!err_check(dwm_thread_resume(event_hndl))) {
-    return -1;
+    if(!err_check(dwm_thread_resume(event_hndl))) {
+      return -1;
+    }
   }
 
   return 0;

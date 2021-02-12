@@ -24,9 +24,6 @@ typedef enum {
  * FUNCTIONS *
  *************/
 
-// FUNCION auxiliar QUE HAY QUE QUITAR!
-void llena_de_unos(void);
-
 /**
  * @brief Check if the NVM is valid.
  *
@@ -78,6 +75,8 @@ rangin_neighbors load_neighbors(void);
  * @retval false If variable was not modified correctly.
  */
 bool set_nvm_uint8_variable(nvm_memory_position mp, int value);
+
+void set_zeros_nvm(void);
 
 /**
  * @brief Store a list of neighbors in the nvm.
