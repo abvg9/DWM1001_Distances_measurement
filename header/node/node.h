@@ -8,6 +8,8 @@
  * FUNCTIONS *
  *************/
 
+void anchor_scan_thread(uint32_t data);
+
 /**
  * @brief Check if a given configuration is equal to the default configuration.
  *
@@ -32,12 +34,6 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg);
  */
 dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_factor);
 
-void dwm_anchor_scan_thread(uint32_t data);
-
-void dwm_event_callback(dwm_evt_t *p_evt);
-
-void dwm_event_thread(uint32_t data);
-
 /**
  * @brief Search if an id is in the list of neighbors.
  *
@@ -48,6 +44,10 @@ void dwm_event_thread(uint32_t data);
  * @retval -1  If node_id is not inside neighbors list.
  */
 int is_there_neighbor(uint16_t node_id);
+
+void message_event_callback(dwm_evt_t *p_evt);
+
+void message_handler_thread(uint32_t data);
 
 /**
  * @brief Set anchor configuration to the node.
@@ -70,7 +70,7 @@ bool set_node_as_anchor(bool initiator);
  */
 bool set_node_as_tag(void);
 
-bool set_node_mode(bool first_run);
+dwm_mode_t set_node_mode(bool first_run);
 
 /**
  * @brief Store id in the list of neighbors.
@@ -79,5 +79,7 @@ bool set_node_mode(bool first_run);
  *
  */
 void store_neighbor(uint16_t node_id);
+
+void tag_scan_thread(uint32_t data);
 
 #endif //NODE

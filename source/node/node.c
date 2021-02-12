@@ -10,6 +10,36 @@ const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 extern rangin_neighbors neighbors;
 extern bool IS_INITIATOR;
 
+void anchor_scan_thread(uint32_t data) {
+
+  // Initialize neighbors list.
+  uint16_t* node_id;
+  dwm_panid_get(node_id);
+  store_neighbor(*node_id);
+
+  dwm_anchor_list_t anchors_list;
+  anchors_list.cnt = 0;
+
+  while(neighbors.cnt != NET_NUM_NODES) {
+
+    if(err_check(dwm_anchor_list_get(&anchors_list))) {
+
+      if(anchors_list.cnt > 0) {
+
+        int i;
+        for(i = 0; i < anchors_list.cnt; ++i) {
+          store_neighbor(anchors_list.v[i].node_id);
+        }
+      }
+    }
+
+  }
+
+  store_neighbors(neighbors);
+  dwm_reset();
+
+}
+
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
 
   if(expected_mode != cfg.mode) {
@@ -99,34 +129,12 @@ dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_facto
   return position;
 }
 
-void dwm_event_callback(dwm_evt_t *p_evt) {
+void message_event_callback(dwm_evt_t *p_evt) {
 
   switch (p_evt->header.id) {
 
-    case DWM_EVT_LOC_READY:
-      blink_led_thread(BLUE_LED, 1, 3);
-      blink_led_thread(GREEN_LED, 1, 3);
-
-      uint8_t len, data[DWM_USR_DATA_LEN_MAX] = { 0xFF, 0x00, 0XFF };
-      len = 3;
-
-      dwm_usr_data_write(data, len, false);
-      // dwm_reset();
-
-    break;
-
-    case DWM_EVT_UWBMAC_JOINED_CHANGED:
-      blink_led_thread(BLUE_LED, 2, 3);
-      blink_led_thread(GREEN_LED, 1, 3);
-    break; 
-
-    case DWM_EVT_BH_INITIALIZED_CHANGED:
-      blink_led_thread(BLUE_LED, 3, 3);
-      blink_led_thread(GREEN_LED, 1, 3);
-    break;
-
     case DWM_EVT_USR_DATA_READY:
-      blink_led_thread(BLUE_LED, 4, 3);
+      blink_led_thread(BLUE_LED, 1, 3);
       blink_led_thread(GREEN_LED, 1, 3);
       // Si salta este sería la clave.
       // p_evt->usr_data[i]
@@ -134,60 +142,29 @@ void dwm_event_callback(dwm_evt_t *p_evt) {
     break;
 
     case DWM_EVT_USR_DATA_SENT:
-      blink_led_thread(BLUE_LED, 5, 3);
+      blink_led_thread(BLUE_LED, 2, 3);
       blink_led_thread(GREEN_LED, 1, 3);
     break;
 
     default:
-      blink_led_thread(BLUE_LED, 6, 3);
+      blink_led_thread(BLUE_LED, 3, 3);
       blink_led_thread(GREEN_LED, 1, 3);
     break;
   }
 
 }
 
-void dwm_anchor_scan_thread(uint32_t data) {
-
-  // Initialize neighbors list.
-  uint16_t* node_id;
-  dwm_panid_get(node_id);
-  store_neighbor(*node_id);
-
-  dwm_anchor_list_t anchors_list;
-  anchors_list.cnt = 0;
-
-  while(neighbors.cnt != NET_NUM_NODES) {
-
-    if(err_check(dwm_anchor_list_get(&anchors_list))) {
-
-      if(anchors_list.cnt > 0) {
-
-        int i;
-        for(i = 0; i < anchors_list.cnt; ++i) {
-          store_neighbor(anchors_list.v[i].node_id);
-        }
-      }
-    }
-
-  }
-
-  store_neighbors(neighbors);
-  dwm_reset();
-
-}
-
-void dwm_event_thread(uint32_t data) {
+void message_handler_thread(uint32_t data) {
 
   /* Register event callback */
-  dwm_evt_listener_register(DWM_EVT_LOC_READY | DWM_EVT_USR_DATA_READY | 
-    DWM_EVT_USR_DATA_SENT | DWM_EVT_BH_INITIALIZED_CHANGED | DWM_EVT_UWBMAC_JOINED_CHANGED, NULL);
+  dwm_evt_listener_register(DWM_EVT_USR_DATA_READY | DWM_EVT_USR_DATA_SENT, NULL);
 
   dwm_evt_t evt;
 
   while (true) {
 
     if(err_check(dwm_evt_wait(&evt))) {
-      dwm_event_callback(&evt);
+      dwm_message_event_callback(&evt);
     }
   }
 
@@ -297,41 +274,37 @@ bool set_node_as_tag(void) {
   return true;
 }
 
-bool set_node_mode(bool first_run) {
+dwm_mode_t set_node_mode(bool first_run) {
 
   uint16_t* node_id;
-
-  if(!err_check(dwm_panid_get(node_id))) {
-    return false;
-  }
+  dwm_panid_get(node_id);
 
   int index = is_there_neighbor(*node_id);
 
   if(index == get_nvm_uint8_variable(tag_index) && !first_run) {
 
     if(!set_node_as_tag()) {
-      return false;
+      return DWM_MODE_TAG;
     }
+    
 
   } else {
 
     if(index == get_nvm_uint8_variable(initiator_index)  && !first_run) {
 
       if(!set_node_as_anchor(true)) {
-        return false;
+        return DWM_MODE_ANCHOR;
       }
 
     } else {
 
       if(!set_node_as_anchor(IS_INITIATOR)) {
-        return false;
+        return DWM_MODE_ANCHOR;
       }
 
     }
 
   }
-
-  return true;
 
 }
 
@@ -354,5 +327,20 @@ void store_neighbor(uint16_t node_id) {
     neighbors.node_ids[i + 1] = node_id;
     neighbors.cnt++;
   }
+
+}
+
+void tag_scan_thread(uint32_t data) {
+
+  dwm_loc_data_t loc;
+  dwm_loc_get(&loc);
+
+  while(loc.anchors.dist.cnt != NET_NUM_NODES-1) {
+    dwm_loc_get(&loc);
+  }
+
+  int patata = 0;
+  // AHORA SOLO QUEDA ENVIAR LAS DISTANCIAS Y REINICIARTE.
+  //dwm_reset();
 
 }
