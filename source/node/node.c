@@ -8,6 +8,7 @@ const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, true, DWM_MEAS_MODE_TWR}
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
 extern rangin_neighbors neighbors;
+extern bool IS_INITIATOR;
 
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
 
@@ -149,10 +150,7 @@ void dwm_anchor_scan_thread(uint32_t data) {
 
   // Initialize neighbors list.
   uint16_t* node_id;
-
-  if(!err_check(dwm_panid_get(node_id))) {
-    return false;
-  }
+  dwm_panid_get(node_id);
   store_neighbor(*node_id);
 
   dwm_anchor_list_t anchors_list;
@@ -325,7 +323,7 @@ bool set_node_mode(bool first_run) {
 
     } else {
 
-      if(!set_node_as_anchor(false)) {
+      if(!set_node_as_anchor(IS_INITIATOR)) {
         return false;
       }
 

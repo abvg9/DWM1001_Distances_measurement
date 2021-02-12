@@ -66,7 +66,7 @@ bool set_node_as_anchor(bool initiator);
  *
  * @return bool
  * @retval true If the node could be configured as tag.
- * @retval false If the node could not be configured as tag.s
+ * @retval false If the node could not be configured as tag.
  */
 bool set_node_as_tag(void);
 
