@@ -164,7 +164,7 @@ void message_handler_thread(uint32_t data) {
   while (true) {
 
     if(err_check(dwm_evt_wait(&evt))) {
-      dwm_message_event_callback(&evt);
+      message_event_callback(&evt);
     }
   }
 
@@ -283,7 +283,7 @@ dwm_mode_t set_node_mode(bool first_run) {
 
   if(index == get_nvm_uint8_variable(tag_index) && !first_run) {
 
-    if(!set_node_as_tag()) {
+    if(set_node_as_tag()) {
       return DWM_MODE_TAG;
     }
     
@@ -292,19 +292,21 @@ dwm_mode_t set_node_mode(bool first_run) {
 
     if(index == get_nvm_uint8_variable(initiator_index)  && !first_run) {
 
-      if(!set_node_as_anchor(true)) {
+      if(set_node_as_anchor(true)) {
         return DWM_MODE_ANCHOR;
       }
 
     } else {
 
-      if(!set_node_as_anchor(IS_INITIATOR)) {
+      if(set_node_as_anchor(IS_INITIATOR)) {
         return DWM_MODE_ANCHOR;
       }
 
     }
 
   }
+
+  return -1;
 
 }
 
