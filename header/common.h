@@ -33,7 +33,7 @@
 
 typedef struct {
   int cnt;
-  uint16_t node_ids[DWM_RANGING_ANCHOR_CNT_MAX];
+  uint64_t node_ids[DWM_RANGING_ANCHOR_CNT_MAX];
 } rangin_neighbors;
 
 /*************

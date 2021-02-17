@@ -3,18 +3,19 @@
 /*******************************
  * DEFAULT NODE CONFIGURATIONS *
  *******************************/
-const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, false, false};
-const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, true, DWM_MEAS_MODE_TWR};
+const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, false, false};
+const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, false, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
 extern rangin_neighbors neighbors;
 extern bool IS_INITIATOR;
+extern int PANID;
 
 void anchor_scan_thread(uint32_t data) {
 
   // Initialize neighbors list.
-  uint16_t* node_id;
-  dwm_panid_get(node_id);
+  uint64_t* node_id;
+  dwm_node_id_get(node_id);
   store_neighbor(*node_id);
 
   dwm_anchor_list_t anchors_list;
@@ -216,6 +217,10 @@ bool set_node_as_anchor(bool initiator) {
       return false;
     }
 
+    if(!err_check(dwm_panid_set(PANID))) {
+      return false;
+    }
+
      // Set position.
     dwm_pos_t pos_get;
 
@@ -250,6 +255,7 @@ bool set_node_as_tag(void) {
   if(!check_configuration(DWM_MODE_TAG, cfg)) {
 
     // Update rate set to 1 second, stationary update rate set to 5 seconds.
+    /*
     if(!err_check(dwm_upd_rate_set(10, 10))) {
       return false;
     }
@@ -258,11 +264,16 @@ bool set_node_as_tag(void) {
     if(!err_check(dwm_stnry_cfg_set(DWM_STNRY_SENSITIVITY_NORMAL))) {
       return false;
     }
+    */
  
     dwm_cfg_tag_t tag_cfg = default_tag_cfg;
     tag_cfg.common = default_common_cfg;
 
     if(!err_check(dwm_cfg_tag_set(&tag_cfg))) {
+      return false;
+    }
+
+    if(!err_check(dwm_panid_set(PANID))) {
       return false;
     }
 
@@ -276,8 +287,8 @@ bool set_node_as_tag(void) {
 
 dwm_mode_t set_node_mode(bool first_run) {
 
-  uint16_t* node_id;
-  dwm_panid_get(node_id);
+  uint64_t* node_id;
+  dwm_node_id_get(node_id);
 
   int index = is_there_neighbor(*node_id);
 
@@ -310,7 +321,7 @@ dwm_mode_t set_node_mode(bool first_run) {
 
 }
 
-void store_neighbor(uint16_t node_id) {
+void store_neighbor(uint64_t node_id) {
 
   if(neighbors.cnt == 0) {
 
@@ -338,10 +349,11 @@ void tag_scan_thread(uint32_t data) {
   dwm_loc_get(&loc);
 
   while(loc.anchors.dist.cnt != NET_NUM_NODES-1) {
-    dwm_loc_get(&loc);
+    int rc = dwm_loc_get(&loc);
   }
 
   int patata = 0;
+  patata++;
   // AHORA SOLO QUEDA ENVIAR LAS DISTANCIAS Y REINICIARTE.
   //dwm_reset();
 

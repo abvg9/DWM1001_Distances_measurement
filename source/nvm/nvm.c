@@ -53,8 +53,7 @@ rangin_neighbors load_neighbors(void) {
 
   if(err_check(dwm_nvm_usr_data_get(nvm, &len))) {
 
-    int i;
-    int j;
+    int i, j, k;
 
     neighbors.cnt = nvm[number_of_scanned_neighbors];
 
@@ -63,12 +62,14 @@ rangin_neighbors load_neighbors(void) {
       neighbors.cnt = 0;
     }
 
-    // An id of a node occupies 16 bits, and the NVM
+    // An id of a node occupies 64 bits, and the NVM
     // positions are of 8 bits, so to load
     // an id, we need to load to positions of the nvm.
-    for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
-      neighbors.node_ids[j] = 
-        ((uint16_t) nvm[neighbors_start_address + i + 1] << 8) | nvm[neighbors_start_address + i];
+    for(i = 0, j = 0; i < neighbors.cnt; i+=sizeof(uint64_t)/sizeof(uint8_t), ++j) {
+      for(k = 1; k <= sizeof(uint64_t)/sizeof(uint8_t); ++k) {
+        neighbors.node_ids[j] |= (uint64_t) nvm[neighbors_start_address + i + k - 1] << sizeof(uint8_t)*k;
+      }
+
     }
   }
 
@@ -109,17 +110,20 @@ bool store_neighbors(rangin_neighbors neighbors) {
 
   if(!err_check(dwm_nvm_usr_data_get(nvm, &len))) {
 
-    int i;
-    int j;
+    int i, j, k;
+    uint64_t masc = 0XFF00000000000000;
 
     nvm[number_of_scanned_neighbors] = neighbors.cnt;
 
-    // An id of a node occupies 16 bits, and the NVM
+    // An id of a node occupies 64 bits, and the NVM
     // positions are of 8 bits, so to load
     // an id, we need to load to positions of the nvm.
-    for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
-      nvm[neighbors_start_address + i] = (uint8_t)((neighbors.node_ids[j] & 0XFF00) >> 8);
-      nvm[neighbors_start_address + i + 1] = (uint8_t)(neighbors.node_ids[j] & 0X00FF);
+    for(i = 0, j = 0; i < neighbors.cnt; i+=sizeof(uint64_t)/sizeof(uint8_t), ++j) {
+      for(k = 0; masc > 0; ++k) {
+        nvm[neighbors_start_address + i + k] = (uint8_t)((neighbors.node_ids[j] & masc) >> sizeof(uint8_t));
+        masc = masc >> sizeof(uint8_t);
+      }
+      masc = 0XFF00000000000000;
     }
 
     return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));

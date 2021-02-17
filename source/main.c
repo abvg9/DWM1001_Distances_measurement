@@ -6,7 +6,8 @@ rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
 #define FLUSH_MEMORY true
-bool IS_INITIATOR=true;
+bool IS_INITIATOR=false;
+const uint16_t PANID = 0xABCD;
 
 int dwm_user_start(void) {
 
@@ -14,9 +15,7 @@ int dwm_user_start(void) {
   // swtich case with the commands.
 
   if(FLUSH_MEMORY) {
-
     set_zeros_nvm();
-
   } else {
 
     uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
@@ -40,6 +39,8 @@ int dwm_user_start(void) {
     }
 
     dwm_mode_t mode = set_node_mode(first_run);
+    //set_node_as_tag();
+    //dwm_mode_t mode = DWM_MODE_TAG;
 
     if(mode == -1) {
       return -1;

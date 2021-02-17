@@ -78,7 +78,7 @@ dwm_mode_t set_node_mode(bool first_run);
  * @param[in] node_id: Id to store.
  *
  */
-void store_neighbor(uint16_t node_id);
+void store_neighbor(uint64_t node_id);
 
 void tag_scan_thread(uint32_t data);
 
