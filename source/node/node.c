@@ -4,7 +4,7 @@
  * DEFAULT NODE CONFIGURATIONS *
  *******************************/
 const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, false, false};
-const dwm_cfg_tag_t default_tag_cfg = {{}, true, false, false, DWM_MEAS_MODE_TWR};
+const dwm_cfg_tag_t default_tag_cfg = {{}, false, false, false, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
 extern rangin_neighbors neighbors;
@@ -12,11 +12,6 @@ extern bool IS_INITIATOR;
 extern int PANID;
 
 void anchor_scan_thread(uint32_t data) {
-
-  // Initialize neighbors list.
-  uint64_t* node_id;
-  dwm_node_id_get(node_id);
-  store_neighbor(*node_id);
 
   dwm_anchor_list_t anchors_list;
   anchors_list.cnt = 0;
@@ -35,6 +30,10 @@ void anchor_scan_thread(uint32_t data) {
     }
 
   }
+
+  uint64_t node_id;
+  dwm_node_id_get(&node_id);
+  store_neighbor(node_id);
 
   store_neighbors(neighbors);
   dwm_reset();
@@ -171,7 +170,7 @@ void message_handler_thread(uint32_t data) {
 
 }
 
-int is_there_neighbor(uint16_t node_id) {
+int is_there_neighbor(uint64_t node_id) {
 
   if(neighbors.cnt == 0) {
     return -1;
@@ -287,10 +286,10 @@ bool set_node_as_tag(void) {
 
 dwm_mode_t set_node_mode(bool first_run) {
 
-  uint64_t* node_id;
-  dwm_node_id_get(node_id);
+  uint64_t node_id;
+  dwm_node_id_get(&node_id);
 
-  int index = is_there_neighbor(*node_id);
+  int index = is_there_neighbor(node_id);
 
   if(index == get_nvm_uint8_variable(tag_index) && !first_run) {
 

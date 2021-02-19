@@ -5,8 +5,8 @@ bool first_run = true;
 rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
-#define FLUSH_MEMORY true
-bool IS_INITIATOR=false;
+#define FLUSH_MEMORY false
+bool IS_INITIATOR=true;
 const uint16_t PANID = 0xABCD;
 
 int dwm_user_start(void) {
@@ -37,7 +37,7 @@ int dwm_user_start(void) {
     } else {
       return -1;
     }
-
+  
     dwm_mode_t mode = set_node_mode(first_run);
     //set_node_as_tag();
     //dwm_mode_t mode = DWM_MODE_TAG;

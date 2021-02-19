@@ -6,8 +6,8 @@
 /***************
  * DEFINITIONS *
  ***************/
-#define NVM_VALID_VARIABLE_SIZE 3
-#define VALID_VALUE 0XFF
+#define NVM_VALID_VARIABLE_SIZE 6
+#define VALID_VALUE 0XAB
 
 /*********
  * ENUMS *
