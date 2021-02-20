@@ -40,12 +40,18 @@ int dwm_user_start(void) {
     } else {
       return -1;
     }
-  
+
     dwm_mode_t mode = set_node_mode(first_run);
 
     if(mode == -1) {
       return -1;
     }
+
+    uint64_t node_id;
+    dwm_node_id_get(&node_id);
+    node_id &= 0X000000000000FFFF;
+
+    int index = is_there_neighbor(node_id);
 
     if(mode == DWM_MODE_ANCHOR && (first_run || neighbors.cnt == 0)) {
 
@@ -61,7 +67,7 @@ int dwm_user_start(void) {
         return -1;
       }
 
-    } else {
+    }else if(index == get_nvm_uint8_variable(tag_index) && !first_run) {
 
       // Tag scan thread
       uint8_t tag_scan_hndl;

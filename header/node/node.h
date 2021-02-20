@@ -61,7 +61,6 @@ bool set_node_as_anchor(void);
 /**
  * @brief Set anchor configuration to the tag.
  *
- *
  * @return bool
  * @retval true If the node could be configured as tag.
  * @retval false If the node could not be configured as tag.

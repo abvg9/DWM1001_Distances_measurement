@@ -286,6 +286,7 @@ dwm_mode_t set_node_mode(bool first_run) {
 
   uint64_t node_id;
   dwm_node_id_get(&node_id);
+  node_id &= 0X000000000000FFFF;
 
   int index = is_there_neighbor(node_id);
 
