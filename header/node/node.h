@@ -52,13 +52,11 @@ void message_handler_thread(uint32_t data);
 /**
  * @brief Set anchor configuration to the node.
  *
- * @param[in] initiator: If node must be the initiator of the comunications.
- *
  * @return bool
  * @retval true If the node could be configured as anchor.
  * @retval false If the node could not be configured as anchor.
  */
-bool set_node_as_anchor(bool initiator);
+bool set_node_as_anchor(void);
 
 /**
  * @brief Set anchor configuration to the tag.

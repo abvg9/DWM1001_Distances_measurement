@@ -6,8 +6,7 @@ rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
 #define FLUSH_MEMORY false
-bool IS_INITIATOR=true;
-const uint16_t PANID = 0xABCD;
+const uint16_t PANID = 0xDECA;
 
 int dwm_user_start(void) {
 
@@ -17,6 +16,10 @@ int dwm_user_start(void) {
   if(FLUSH_MEMORY) {
     set_zeros_nvm();
   } else {
+
+    if(!err_check(dwm_panid_set(PANID))) {
+      return -1;
+    }
 
     uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
     uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;

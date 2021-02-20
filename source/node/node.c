@@ -3,13 +3,11 @@
 /*******************************
  * DEFAULT NODE CONFIGURATIONS *
  *******************************/
-const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, false, false};
+const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, false, false};
 const dwm_cfg_tag_t default_tag_cfg = {{}, false, false, false, DWM_MEAS_MODE_TWR};
-const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
+const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, true};
 
 extern rangin_neighbors neighbors;
-extern bool IS_INITIATOR;
-extern int PANID;
 
 void anchor_scan_thread(uint32_t data) {
 
@@ -22,10 +20,15 @@ void anchor_scan_thread(uint32_t data) {
 
       if(anchors_list.cnt > 0) {
 
+        blink_led_thread(BLUE_LED, anchors_list.cnt, 1);
+        blink_led_thread(GREEN_LED, anchors_list.cnt, 1);
+
         int i;
         for(i = 0; i < anchors_list.cnt; ++i) {
           store_neighbor(anchors_list.v[i].node_id);
         }
+      }else {
+        blink_led_thread(RED1_LED, 1, 1);
       }
     }
 
@@ -198,7 +201,7 @@ int is_there_neighbor(uint64_t node_id) {
 
 }
 
-bool set_node_as_anchor(bool initiator) {
+bool set_node_as_anchor(void) {
 
   dwm_cfg_t cfg;
 
@@ -209,14 +212,9 @@ bool set_node_as_anchor(bool initiator) {
   if(!check_configuration(DWM_MODE_ANCHOR, cfg)) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
-    anchor_cfg.initiator = initiator;
     anchor_cfg.common = default_common_cfg;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
-      return false;
-    }
-
-    if(!err_check(dwm_panid_set(PANID))) {
       return false;
     }
 
@@ -272,10 +270,6 @@ bool set_node_as_tag(void) {
       return false;
     }
 
-    if(!err_check(dwm_panid_set(PANID))) {
-      return false;
-    }
-
     // To apply changes we need to reset the board.
     dwm_reset();
 
@@ -297,23 +291,11 @@ dwm_mode_t set_node_mode(bool first_run) {
       return DWM_MODE_TAG;
     }
     
-
   } else {
 
-    if(index == get_nvm_uint8_variable(initiator_index)  && !first_run) {
-
-      if(set_node_as_anchor(true)) {
-        return DWM_MODE_ANCHOR;
-      }
-
-    } else {
-
-      if(set_node_as_anchor(IS_INITIATOR)) {
-        return DWM_MODE_ANCHOR;
-      }
-
+    if(set_node_as_anchor()) {
+      return DWM_MODE_ANCHOR;
     }
-
   }
 
   return -1;
