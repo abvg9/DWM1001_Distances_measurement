@@ -64,9 +64,9 @@ rangin_neighbors load_neighbors(void) {
     // An id of a node occupies 16 bits, and the NVM
     // positions are of 8 bits, so to load
     // an id, we need to load to positions of the nvm.
-    for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
+    for(i = 0, j = 0; i < neighbors.cnt*2; i+=2, ++j) {
         neighbors.node_ids[j] = 
-          ((uint64_t) nvm[neighbors_start_address + i] << 8) | nvm[neighbors_start_address + i];
+          ((uint64_t) nvm[neighbors_start_address + i] << 8) | nvm[neighbors_start_address + i + 1];
     }
   }
 
@@ -105,7 +105,7 @@ bool store_neighbors(rangin_neighbors neighbors) {
   uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
-  if(!err_check(dwm_nvm_usr_data_get(nvm, &len))) {
+  if(err_check(dwm_nvm_usr_data_get(nvm, &len))) {
 
     int i, j;
 
@@ -114,7 +114,7 @@ bool store_neighbors(rangin_neighbors neighbors) {
     // An id of a node occupies 16 bits, and the NVM
     // positions are of 8 bits, so to load
     // an id, we need to load to positions of the nvm.
-    for(i = 0, j = 0; i < neighbors.cnt; i+=2, ++j) {
+    for(i = 0, j = 0; i < neighbors.cnt*2; i+=2, ++j) {
       nvm[neighbors_start_address + i] = (uint8_t)((neighbors.node_ids[j] & 0XFF00) >> 8);
       nvm[neighbors_start_address + i + 1] = (uint8_t)(neighbors.node_ids[j] & 0X00FF);
     }
