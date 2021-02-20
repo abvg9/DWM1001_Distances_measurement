@@ -3,7 +3,7 @@
 /*******************************
  * DEFAULT NODE CONFIGURATIONS *
  *******************************/
-const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, false, false};
+const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, false, false};
 const dwm_cfg_tag_t default_tag_cfg = {{}, false, false, false, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, true};
 
@@ -14,7 +14,7 @@ void anchor_scan_thread(uint32_t data) {
   dwm_anchor_list_t anchors_list;
   anchors_list.cnt = 0;
 
-  while(neighbors.cnt != NET_NUM_NODES) {
+  while(neighbors.cnt != NET_NUM_NODES -1) {
 
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
@@ -36,6 +36,10 @@ void anchor_scan_thread(uint32_t data) {
 
   uint64_t node_id;
   dwm_node_id_get(&node_id);
+
+  // Get the last 16 bits, the node id.
+  node_id &= 0X000000000000FFFF;
+
   store_neighbor(node_id);
 
   store_neighbors(neighbors);
@@ -173,7 +177,7 @@ void message_handler_thread(uint32_t data) {
 
 }
 
-int is_there_neighbor(uint64_t node_id) {
+int is_there_neighbor(uint16_t node_id) {
 
   if(neighbors.cnt == 0) {
     return -1;

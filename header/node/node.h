@@ -43,7 +43,7 @@ dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_facto
  * @retval >= 0 If node_id is inside neighbors list.
  * @retval -1  If node_id is not inside neighbors list.
  */
-int is_there_neighbor(uint64_t node_id);
+int is_there_neighbor(uint16_t node_id);
 
 void message_event_callback(dwm_evt_t *p_evt);
 

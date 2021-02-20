@@ -42,8 +42,6 @@ int dwm_user_start(void) {
     }
   
     dwm_mode_t mode = set_node_mode(first_run);
-    //set_node_as_tag();
-    //dwm_mode_t mode = DWM_MODE_TAG;
 
     if(mode == -1) {
       return -1;
