@@ -1,7 +1,6 @@
 #include "node.h"
 #include "nvm.h"
 
-bool first_run = true;
 rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
@@ -33,7 +32,6 @@ int dwm_user_start(void) {
         }
 
       } else {
-        first_run = false;
         neighbors = load_neighbors();
       }
 
@@ -41,7 +39,7 @@ int dwm_user_start(void) {
       return -1;
     }
 
-    dwm_mode_t mode = set_node_mode(first_run);
+    dwm_mode_t mode = set_node_mode();
 
     if(mode == -1) {
       return -1;
@@ -49,7 +47,7 @@ int dwm_user_start(void) {
 
     int index = get_nvm_uint8_variable(my_neighbor_index);
 
-    if(mode == DWM_MODE_ANCHOR && (first_run || neighbors.cnt == 0 || index == INVALID_INDEX)) {
+    if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index == INVALID_INDEX)) {
 
       // Anchor scan thread
       uint8_t anchor_scan_hndl;
@@ -63,7 +61,7 @@ int dwm_user_start(void) {
         return -1;
       }
 
-    }else if(index == get_nvm_uint8_variable(tag_index) && !first_run) {
+    } else if(index == get_nvm_uint8_variable(tag_index)) {
 
       // Tag scan thread
       uint8_t tag_scan_hndl;
