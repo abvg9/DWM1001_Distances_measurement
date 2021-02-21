@@ -67,7 +67,7 @@ bool set_node_as_anchor(void);
  */
 bool set_node_as_tag(void);
 
-dwm_mode_t set_node_mode();
+dwm_mode_t set_node_mode(void);
 
 /**
  * @brief Store id in the list of neighbors.

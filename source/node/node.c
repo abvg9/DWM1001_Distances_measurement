@@ -283,11 +283,11 @@ bool set_node_as_tag(void) {
   return true;
 }
 
-dwm_mode_t set_node_mode() {
+dwm_mode_t set_node_mode(void) {
 
   int index = get_nvm_uint8_variable(my_neighbor_index);
 
-  if(index == get_nvm_uint8_variable(tag_index)) {
+  if(index == get_nvm_uint8_variable(tag_index) && index != INVALID_INDEX) {
 
     if(set_node_as_tag()) {
       return DWM_MODE_TAG;
