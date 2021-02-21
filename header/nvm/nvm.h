@@ -17,7 +17,8 @@ typedef enum {
   valid_NVM = 0, // Indicates if the nvm has a valid configuration.
   number_of_scanned_neighbors = NVM_VALID_VARIABLE_SIZE, // Number of sanned neighbors.
   tag_index = number_of_scanned_neighbors + 1, // Index of node must be a tag.
-  my_neighbor_index = tag_index + 1,
+  my_neighbor_index = tag_index + 1, // Index of the node in the neighbors list.
+  initiator_index = my_neighbor_index + 1, // Index of node must be the initiator.
   neighbors_start_address = my_neighbor_index + 1 // Initial address of the neighbors.
 } nvm_memory_position;
 

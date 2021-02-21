@@ -206,7 +206,7 @@ int is_there_neighbor(uint16_t node_id) {
 
 }
 
-bool set_node_as_anchor(void) {
+bool set_node_as_anchor(bool isInitiator) {
 
   dwm_cfg_t cfg;
 
@@ -218,6 +218,7 @@ bool set_node_as_anchor(void) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
+    anchor_cfg.initiator = isInitiator;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -283,9 +284,7 @@ bool set_node_as_tag(void) {
   return true;
 }
 
-dwm_mode_t set_node_mode(void) {
-
-  int index = get_nvm_uint8_variable(my_neighbor_index);
+dwm_mode_t set_node_mode(uint8_t index) {
 
   if(index == get_nvm_uint8_variable(tag_index) && index != INVALID_INDEX) {
 
@@ -295,9 +294,21 @@ dwm_mode_t set_node_mode(void) {
     
   } else {
 
-    if(set_node_as_anchor()) {
-      return DWM_MODE_ANCHOR;
+    if(index == INVALID_INDEX || index != get_nvm_uint8_variable(initiator_index)) {
+
+      if(set_node_as_anchor(false)) {
+        return DWM_MODE_ANCHOR;
+      }
+
+    } else {
+
+      if(set_node_as_anchor(true)) {
+        return DWM_MODE_ANCHOR;
+      }
+
     }
+
+
   }
 
   return -1;
@@ -331,12 +342,14 @@ void tag_scan_thread(uint32_t data) {
   dwm_loc_data_t loc;
   dwm_loc_get(&loc);
 
-  while(loc.anchors.dist.cnt != NET_NUM_NODES-1) {
-    int rc = dwm_loc_get(&loc);
+  while(loc.anchors.dist.cnt != NET_NUM_NODES-1 && !dwm_loc_get(&loc)) {
+
+    if(loc.anchors.dist.cnt > 0) {
+      int patata;
+      patata++;
+    }
   }
 
-  int patata = 0;
-  patata++;
   // AHORA SOLO QUEDA ENVIAR LAS DISTANCIAS Y REINICIARTE.
   //dwm_reset();
 

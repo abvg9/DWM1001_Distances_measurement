@@ -39,13 +39,13 @@ int dwm_user_start(void) {
       return -1;
     }
 
-    dwm_mode_t mode = set_node_mode();
+    uint8_t index = get_nvm_uint8_variable(my_neighbor_index);
+
+    dwm_mode_t mode = set_node_mode(index);
 
     if(mode == -1) {
       return -1;
     }
-
-    uint8_t index = get_nvm_uint8_variable(my_neighbor_index);
 
     if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index == INVALID_INDEX)) {
 
