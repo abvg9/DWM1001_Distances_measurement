@@ -79,4 +79,6 @@ void store_neighbor(uint64_t node_id);
 
 void tag_scan_thread(uint32_t data);
 
+void update_state(void);
+
 #endif //NODE

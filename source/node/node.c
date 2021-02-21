@@ -5,7 +5,7 @@
  *******************************/
 const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, false, false};
 const dwm_cfg_tag_t default_tag_cfg = {{}, false, false, false, DWM_MEAS_MODE_TWR};
-const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, true};
+const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
 extern rangin_neighbors neighbors;
 
@@ -144,9 +144,8 @@ void message_event_callback(dwm_evt_t *p_evt) {
     case DWM_EVT_USR_DATA_READY:
       blink_led_thread(BLUE_LED, 1, 3);
       blink_led_thread(GREEN_LED, 1, 3);
-      // Si salta este sería la clave.
       // p_evt->usr_data[i]
-      // dwm_reset();
+      update_state();
     break;
 
     case DWM_EVT_USR_DATA_SENT:
@@ -219,6 +218,7 @@ bool set_node_as_anchor(bool isInitiator) {
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
     anchor_cfg.initiator = isInitiator;
+    anchor_cfg.bridge = isInitiator;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -340,17 +340,29 @@ void store_neighbor(uint64_t node_id) {
 void tag_scan_thread(uint32_t data) {
 
   dwm_loc_data_t loc;
-  dwm_loc_get(&loc);
 
-  while(loc.anchors.dist.cnt != NET_NUM_NODES && !dwm_loc_get(&loc)) { // ACUERDADE DE PONER UN -1
+  do {
+    dwm_loc_get(&loc);
+  } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
 
-    if(loc.anchors.dist.cnt > 0) {
-      int patata;
-      patata++;
-    }
-  }
 
-  // AHORA SOLO QUEDA ENVIAR LAS DISTANCIAS Y REINICIARTE.
-  //dwm_reset();
+  /* TODO */
+  // ENVIAMOS DISTANCIAS A LA CONTROLADORA.
 
+  // AVISAMOS AL RESTO DE NODOS DE QUE TODOS DEBEN AVANZAR DE ESTADO.
+  uint8_t message[DWM_USR_DATA_LEN_MAX];
+  dwm_usr_data_write(message, DWM_USR_DATA_LEN_MAX, false);
+
+  update_state();
+}
+
+void update_state(void) {
+
+  uint8_t i_index = get_nvm_uint8_variable(initiator_index) + 1;
+  uint8_t t_index = get_nvm_uint8_variable(tag_index) + 1;
+
+  set_nvm_uint8_variable(i_index, initiator_index%neighbors.cnt);
+  set_nvm_uint8_variable(t_index, tag_index%neighbors.cnt);
+
+  dwm_reset();
 }
