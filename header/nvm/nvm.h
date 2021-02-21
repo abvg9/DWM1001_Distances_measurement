@@ -8,6 +8,7 @@
  ***************/
 #define NVM_VALID_VARIABLE_SIZE 6
 #define VALID_VALUE 0XAB
+#define INVALID_INDEX 0XFF
 
 /*********
  * ENUMS *
@@ -16,7 +17,8 @@ typedef enum {
   valid_NVM = 0, // Indicates if the nvm has a valid configuration.
   number_of_scanned_neighbors = NVM_VALID_VARIABLE_SIZE, // Number of sanned neighbors.
   tag_index = number_of_scanned_neighbors + 1, // Index of node must be a tag.
-  neighbors_start_address = tag_index + 1 // Initial address of the neighbors.
+  my_neighbor_index = tag_index + 1,
+  neighbors_start_address = my_neighbor_index + 1 // Initial address of the neighbors.
 } nvm_memory_position;
 
 /*************
@@ -73,7 +75,7 @@ rangin_neighbors load_neighbors(void);
  * @retval true If variable was modified correctly.
  * @retval false If variable was not modified correctly.
  */
-bool set_nvm_uint8_variable(nvm_memory_position mp, int value);
+bool set_nvm_uint8_variable(nvm_memory_position mp, uint8_t value);
 
 void set_zeros_nvm(void);
 

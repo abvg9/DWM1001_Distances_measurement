@@ -41,6 +41,7 @@ void anchor_scan_thread(uint32_t data) {
   node_id &= 0X000000000000FFFF;
 
   store_neighbor(node_id);
+  set_nvm_uint8_variable(my_neighbor_index, is_there_neighbor(node_id));
 
   store_neighbors(neighbors);
   dwm_reset();

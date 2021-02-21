@@ -26,6 +26,7 @@ bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
   nvm[number_of_scanned_neighbors] = 0;
   nvm[tag_index] = 0;
+  nvm[my_neighbor_index] = 0xFF;
 
   return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
 }
@@ -73,7 +74,7 @@ rangin_neighbors load_neighbors(void) {
   return neighbors;
 }
 
-bool set_nvm_uint8_variable(nvm_memory_position mp, int value) {
+bool set_nvm_uint8_variable(nvm_memory_position mp, uint8_t value) {
   
   uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;

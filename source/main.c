@@ -47,13 +47,9 @@ int dwm_user_start(void) {
       return -1;
     }
 
-    uint64_t node_id;
-    dwm_node_id_get(&node_id);
-    node_id &= 0X000000000000FFFF;
+    int index = get_nvm_uint8_variable(my_neighbor_index);
 
-    int index = is_there_neighbor(node_id);
-
-    if(mode == DWM_MODE_ANCHOR && (first_run || neighbors.cnt == 0)) {
+    if(mode == DWM_MODE_ANCHOR && (first_run || neighbors.cnt == 0 || index == INVALID_INDEX)) {
 
       // Anchor scan thread
       uint8_t anchor_scan_hndl;
