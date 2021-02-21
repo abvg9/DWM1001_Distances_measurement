@@ -294,7 +294,7 @@ dwm_mode_t set_node_mode(uint8_t index) {
     
   } else {
 
-    if(index == INVALID_INDEX || index != get_nvm_uint8_variable(initiator_index)) {
+    if(index != INVALID_INDEX && index != get_nvm_uint8_variable(initiator_index)) {
 
       if(set_node_as_anchor(false)) {
         return DWM_MODE_ANCHOR;
@@ -342,7 +342,7 @@ void tag_scan_thread(uint32_t data) {
   dwm_loc_data_t loc;
   dwm_loc_get(&loc);
 
-  while(loc.anchors.dist.cnt != NET_NUM_NODES-1 && !dwm_loc_get(&loc)) {
+  while(loc.anchors.dist.cnt != NET_NUM_NODES && !dwm_loc_get(&loc)) { // ACUERDADE DE PONER UN -1
 
     if(loc.anchors.dist.cnt > 0) {
       int patata;
