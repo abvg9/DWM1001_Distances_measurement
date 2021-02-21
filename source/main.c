@@ -45,7 +45,7 @@ int dwm_user_start(void) {
       return -1;
     }
 
-    int index = get_nvm_uint8_variable(my_neighbor_index);
+    uint8_t index = get_nvm_uint8_variable(my_neighbor_index);
 
     if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index == INVALID_INDEX)) {
 
