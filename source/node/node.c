@@ -184,7 +184,7 @@ int is_there_neighbor(uint16_t node_id) {
     return -1;
   }
 
-  int medium = 0, left_limit = 0, right_limit = 0;
+  int medium = 0, left_limit = 0, right_limit = neighbors.cnt-1;
 
   while(left_limit <= right_limit) {
 
