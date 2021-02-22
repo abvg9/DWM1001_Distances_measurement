@@ -4,7 +4,7 @@
 rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
-#define FLUSH_MEMORY false
+#define FLUSH_MEMORY true
 const uint16_t PANID = 0xDECA;
 bool first_run = true;
 
@@ -33,8 +33,13 @@ int dwm_user_start(void) {
         }
 
       } else {
-        first_run = false;
         neighbors = load_neighbors();
+
+        if(neighbors.cnt == 0) {
+          first_run = true;
+        } else {
+          first_run = false;
+        }
       }
 
     } else {
