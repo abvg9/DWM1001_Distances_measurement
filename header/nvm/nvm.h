@@ -8,7 +8,6 @@
  ***************/
 #define NVM_VALID_VARIABLE_SIZE 6
 #define VALID_VALUE 0XAB
-#define INVALID_INDEX 0XFF
 
 /*********
  * ENUMS *

@@ -4,7 +4,7 @@
 rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
-#define FLUSH_MEMORY true
+#define FLUSH_MEMORY false
 const uint16_t PANID = 0xDECA;
 bool first_run = true;
 
@@ -54,7 +54,7 @@ int dwm_user_start(void) {
       return -1;
     }
 
-    if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index == INVALID_INDEX)) {
+    if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index > DWM_RANGING_ANCHOR_CNT_MAX+1)) {
 
       // Anchor scan thread
       uint8_t anchor_scan_hndl;
