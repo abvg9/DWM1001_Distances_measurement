@@ -77,7 +77,7 @@ rangin_neighbors load_neighbors(void);
  */
 bool set_nvm_uint8_variable(nvm_memory_position mp, uint8_t value);
 
-void set_zeros_nvm(void);
+void set_zeros_nvm(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]);
 
 /**
  * @brief Store a list of neighbors in the nvm.

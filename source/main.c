@@ -12,38 +12,36 @@ int dwm_user_start(void) {
 
   // while(controller send a message)
   // swtich case with the commands.
+  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
+  uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
+
+  if(!err_check(dwm_nvm_usr_data_get(nvm, &len))) {
+    return -1;
+  }
 
   if(FLUSH_MEMORY) {
-    set_zeros_nvm();
+    set_zeros_nvm(nvm);
   } else {
 
     if(!err_check(dwm_panid_set(PANID))) {
       return -1;
     }
 
-    uint8_t buf[DWM_NVM_USR_DATA_LEN_MAX];
-    uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
+    if(!check_nvm_validity(nvm)) {
 
-    if(err_check(dwm_nvm_usr_data_get(buf, &len))) {
-
-      if(!check_nvm_validity(buf)) {
-
-        if(!clean_memory(buf)) {
-          return -1;
-        }
-
-      } else {
-        neighbors = load_neighbors();
-
-        if(neighbors.cnt == 0) {
-          first_run = true;
-        } else {
-          first_run = false;
-        }
+      if(!clean_memory(nvm)) {
+        return -1;
       }
 
     } else {
-      return -1;
+      neighbors = load_neighbors();
+
+      if(neighbors.cnt == 0) {
+        first_run = true;
+      } else {
+        first_run = false;
+      }
+
     }
 
     uint8_t index = get_nvm_uint8_variable(my_neighbor_index);

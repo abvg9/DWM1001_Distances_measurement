@@ -16,7 +16,7 @@ bool check_nvm_validity(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
   // Put zeros in all the positions of the NVM.
-  set_zeros_nvm();
+  set_zeros_nvm(nvm);
 
   // Make the NVM valid.
   int i;
@@ -89,16 +89,14 @@ bool set_nvm_uint8_variable(nvm_memory_position mp, uint8_t value) {
   return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
 }
 
-void set_zeros_nvm(void) {
+void set_zeros_nvm(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
 
-  uint8_t clean_nvm[DWM_NVM_USR_DATA_LEN_MAX];
-  
   int i;
   for(i = 0; i < DWM_NVM_USR_DATA_LEN_MAX; ++i) {
-    clean_nvm[i] = 0x00;
+    nvm[i] = 0x00;
   }
 
-  dwm_nvm_usr_data_set(clean_nvm, DWM_NVM_USR_DATA_LEN_MAX);
+  dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX);
 
 }
 
