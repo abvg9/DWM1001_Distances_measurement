@@ -54,37 +54,23 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
     return false;
   }
 
-  switch(expected_mode) {
+  if(expected_mode == DWM_MODE_TAG) {
 
-    case DWM_MODE_TAG:
+    if(default_tag_cfg.stnry_en != cfg.stnry_en) {
+      return false;
+    }
 
-      if(default_tag_cfg.stnry_en != cfg.stnry_en) {
-        return false;
-      }
+    if(default_tag_cfg.meas_mode != cfg.meas_mode) {
+      return false;
+    }
 
-      if(default_tag_cfg.meas_mode != cfg.meas_mode) {
-        return false;
-      }
+    if(default_tag_cfg.low_power_en != cfg.low_power_en) {
+      return false;
+    }
 
-      if(default_tag_cfg.low_power_en != cfg.low_power_en) {
-        return false;
-      }
-
-      if(default_tag_cfg.loc_engine_en != cfg.loc_engine_en) {
-        return false;
-      }
-
-      break;
-    
-    case DWM_MODE_ANCHOR:
-
-      /*
-      if(default_anchor_cfg.bridge != cfg.bridge) {
-        return false;
-      }
-      */
-
-      break;   
+    if(default_tag_cfg.loc_engine_en != cfg.loc_engine_en) {
+      return false;
+    }
 
   }
 
@@ -196,7 +182,7 @@ int is_there_neighbor(uint16_t node_id) {
 
 }
 
-bool set_node_as_anchor(bool isInitiator) {
+bool set_node_as_anchor(bool isInitiator, bool first_run) {
 
   dwm_cfg_t cfg;
 
@@ -209,7 +195,7 @@ bool set_node_as_anchor(bool isInitiator) {
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
     anchor_cfg.initiator = isInitiator;
-    anchor_cfg.bridge = isInitiator;
+    anchor_cfg.bridge = isInitiator * !first_run;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -260,7 +246,7 @@ bool set_node_as_tag(void) {
   return true;
 }
 
-dwm_mode_t set_node_mode(uint8_t index) {
+dwm_mode_t set_node_mode(uint8_t index, bool first_run) {
 
   if(index == get_nvm_uint8_variable(tag_index) && index != INVALID_INDEX) {
 
@@ -272,13 +258,13 @@ dwm_mode_t set_node_mode(uint8_t index) {
 
     if(index != INVALID_INDEX && index != get_nvm_uint8_variable(initiator_index)) {
 
-      if(set_node_as_anchor(false)) {
+      if(set_node_as_anchor(false, first_run)) {
         return DWM_MODE_ANCHOR;
       }
 
     } else {
 
-      if(set_node_as_anchor(true)) {
+      if(set_node_as_anchor(true, first_run)) {
         return DWM_MODE_ANCHOR;
       }
 
@@ -333,8 +319,8 @@ void tag_scan_thread(uint32_t data) {
 
 void update_state(void) {
 
-  uint8_t i_index = get_nvm_uint8_variable(initiator_index) + 1;
-  uint8_t t_index = get_nvm_uint8_variable(tag_index) + 1;
+  uint8_t i_index = get_nvm_uint8_variable(initiator_index) + 0x01;
+  uint8_t t_index = get_nvm_uint8_variable(tag_index) + 0x01;
 
   set_nvm_uint8_variable(i_index, initiator_index%neighbors.cnt);
   set_nvm_uint8_variable(t_index, tag_index%neighbors.cnt);

@@ -6,6 +6,7 @@ rangin_neighbors neighbors;
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
 #define FLUSH_MEMORY false
 const uint16_t PANID = 0xDECA;
+bool first_run = true;
 
 int dwm_user_start(void) {
 
@@ -32,6 +33,7 @@ int dwm_user_start(void) {
         }
 
       } else {
+        first_run = false;
         neighbors = load_neighbors();
       }
 
@@ -41,7 +43,7 @@ int dwm_user_start(void) {
 
     uint8_t index = get_nvm_uint8_variable(my_neighbor_index);
 
-    dwm_mode_t mode = set_node_mode(index);
+    dwm_mode_t mode = set_node_mode(index, first_run);
 
     if(mode == -1) {
       return -1;
@@ -80,7 +82,7 @@ int dwm_user_start(void) {
     uint8_t message_event_hndl;
 
     if(!err_check(dwm_thread_create(THREAD_PRIO, message_handler_thread, (void*)NULL,
-                      "Event_handler", THREAD_STACK_SIZE, &message_event_hndl))) {
+                      "Message_handler", THREAD_STACK_SIZE, &message_event_hndl))) {
       return -1;
     }
 
