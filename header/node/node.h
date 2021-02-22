@@ -44,7 +44,7 @@ void message_handler_thread(uint32_t data);
  * @retval true If the node could be configured as anchor.
  * @retval false If the node could not be configured as anchor.
  */
-bool set_node_as_anchor(bool is_initiator, bool first_run);
+bool set_node_as_anchor(bool is_initiator);
 
 /**
  * @brief Set anchor configuration to the tag.
@@ -55,7 +55,7 @@ bool set_node_as_anchor(bool is_initiator, bool first_run);
  */
 bool set_node_as_tag(void);
 
-dwm_mode_t set_node_mode(uint8_t index, bool first_run);
+dwm_mode_t set_node_mode(uint8_t index);
 
 /**
  * @brief Store id in the list of neighbors.

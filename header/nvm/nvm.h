@@ -18,7 +18,8 @@ typedef enum {
   tag_index = number_of_scanned_neighbors + 1, // Index of node must be a tag.
   my_neighbor_index = tag_index + 1, // Index of the node in the neighbors list.
   initiator_index = my_neighbor_index + 1, // Index of node must be the initiator.
-  neighbors_start_address = initiator_index + 1 // Initial address of the neighbors.
+  bridge_index = initiator_index + 1, // Index of the node must be the bridge.
+  neighbors_start_address = bridge_index + 1 // Initial address of the neighbors.
 } nvm_memory_position;
 
 /*************

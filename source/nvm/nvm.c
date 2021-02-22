@@ -24,7 +24,8 @@ bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
     nvm[valid_NVM + i] = VALID_VALUE;
   }
 
-  nvm[initiator_index] = 0x01;
+  nvm[bridge_index] = 2;
+  nvm[initiator_index] = 1;
   nvm[number_of_scanned_neighbors] = 0;
   nvm[tag_index] = 0;
   nvm[my_neighbor_index] = 0xFF;

@@ -14,14 +14,14 @@ void anchor_scan_thread(uint32_t data) {
   dwm_anchor_list_t anchors_list;
   anchors_list.cnt = 0;
 
-  while(neighbors.cnt != NET_NUM_NODES -1) {
+  while(neighbors.cnt != NET_NUM_NODES-1) {
 
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
       if(anchors_list.cnt > 0) {
 
         blink_led_thread(BLUE_LED, anchors_list.cnt, 1);
-        blink_led_thread(GREEN_LED, anchors_list.cnt, 1);
+        blink_led_thread(GREEN_LED, 1, 1);
 
         int i;
         for(i = 0; i < anchors_list.cnt; ++i) {
@@ -182,7 +182,7 @@ int is_there_neighbor(uint16_t node_id) {
 
 }
 
-bool set_node_as_anchor(bool is_initiator, bool first_run) {
+bool set_node_as_anchor(bool is_initiator) {
 
   dwm_cfg_t cfg;
 
@@ -190,13 +190,11 @@ bool set_node_as_anchor(bool is_initiator, bool first_run) {
     return false;
   }
  
-  if(!check_configuration(DWM_MODE_ANCHOR, cfg) || cfg.initiator != is_initiator ||
-     cfg.bridge != is_initiator * !first_run) {
+  if(!check_configuration(DWM_MODE_ANCHOR, cfg) || cfg.initiator != is_initiator) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
     anchor_cfg.initiator = is_initiator;
-    anchor_cfg.bridge = is_initiator * !first_run;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -247,11 +245,11 @@ bool set_node_as_tag(void) {
   return true;
 }
 
-dwm_mode_t set_node_mode(uint8_t index, bool first_run) {
+dwm_mode_t set_node_mode(uint8_t index) {
 
   if(index > DWM_RANGING_ANCHOR_CNT_MAX+1 || index == get_nvm_uint8_variable(initiator_index)) {
 
-    if(set_node_as_anchor(true, first_run)) {
+    if(set_node_as_anchor(true)) {
       return DWM_MODE_ANCHOR;
     }
 
@@ -261,9 +259,13 @@ dwm_mode_t set_node_mode(uint8_t index, bool first_run) {
       return DWM_MODE_TAG;
     }
 
+  } else if(index == get_nvm_uint8_variable(bridge_index)) {
+
+    
+
   } else {
 
-    if(set_node_as_anchor(false, first_run)) {
+    if(set_node_as_anchor(false)) {
       return DWM_MODE_ANCHOR;
     }
 
@@ -301,7 +303,7 @@ void tag_scan_thread(uint32_t data) {
 
   do {
     dwm_loc_get(&loc);
-  } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
+  } while(loc.anchors.dist.cnt != NET_NUM_NODES-2);
 
 
   /* TODO */
@@ -316,11 +318,13 @@ void tag_scan_thread(uint32_t data) {
 
 void update_state(void) {
 
-  uint8_t i_index = get_nvm_uint8_variable(initiator_index) + 0x01;
-  uint8_t t_index = get_nvm_uint8_variable(tag_index) + 0x01;
+  uint8_t i_index = get_nvm_uint8_variable(initiator_index) + 1;
+  uint8_t t_index = get_nvm_uint8_variable(tag_index) + 1;
+  uint8_t b_index = get_nvm_uint8_variable(bridge_index) + 1;
 
-  set_nvm_uint8_variable(i_index, initiator_index%neighbors.cnt);
-  set_nvm_uint8_variable(t_index, tag_index%neighbors.cnt);
+  set_nvm_uint8_variable(initiator_index, i_index%neighbors.cnt);
+  set_nvm_uint8_variable(tag_index, t_index%neighbors.cnt);
+  set_nvm_uint8_variable(bridge_index, b_index%neighbors.cnt);
 
   dwm_reset();
 }
