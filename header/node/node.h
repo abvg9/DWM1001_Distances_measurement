@@ -37,6 +37,7 @@ void message_event_callback(dwm_evt_t *p_evt);
 
 void message_handler_thread(uint32_t data);
 
+bool set_anchor_as_initiator(bool first_run);
 /**
  * @brief Set anchor configuration to the node.
  *
@@ -44,7 +45,7 @@ void message_handler_thread(uint32_t data);
  * @retval true If the node could be configured as anchor.
  * @retval false If the node could not be configured as anchor.
  */
-bool set_node_as_anchor(bool isInitiator, bool first_run);
+bool set_node_as_anchor(void);
 
 /**
  * @brief Set anchor configuration to the tag.

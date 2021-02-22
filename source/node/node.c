@@ -182,7 +182,35 @@ int is_there_neighbor(uint16_t node_id) {
 
 }
 
-bool set_node_as_anchor(bool isInitiator, bool first_run) {
+bool set_anchor_as_initiator(bool first_run) {
+
+  dwm_cfg_t cfg;
+
+  if(!err_check(dwm_cfg_get(&cfg))) {
+    return false;
+  }
+
+  if(cfg.initiator == false || cfg.bridge != !first_run) {
+
+    dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
+    anchor_cfg.common = default_common_cfg;
+    anchor_cfg.initiator = true;
+    anchor_cfg.bridge = !first_run;
+
+    if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
+      return false;
+    }
+
+    // To apply changes we need to reset the board.
+    dwm_reset();
+
+  }
+
+  return true;
+
+}
+
+bool set_node_as_anchor(void) {
 
   dwm_cfg_t cfg;
 
@@ -190,13 +218,10 @@ bool set_node_as_anchor(bool isInitiator, bool first_run) {
     return false;
   }
   
-  if(!check_configuration(DWM_MODE_TAG, cfg) || cfg.initiator != isInitiator || 
-     cfg.bridge != isInitiator * !first_run) {
+  if(!check_configuration(DWM_MODE_TAG, cfg)) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
-    anchor_cfg.initiator = isInitiator;
-    anchor_cfg.bridge = isInitiator * !first_run;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -259,13 +284,13 @@ dwm_mode_t set_node_mode(uint8_t index, bool first_run) {
 
     if(index != INVALID_INDEX && index != get_nvm_uint8_variable(initiator_index)) {
 
-      if(set_node_as_anchor(false, first_run)) {
+      if(set_node_as_anchor()) {
         return DWM_MODE_ANCHOR;
       }
 
     } else {
 
-      if(set_node_as_anchor(true, first_run)) {
+      if(set_anchor_as_initiator(first_run)) {
         return DWM_MODE_ANCHOR;
       }
 
