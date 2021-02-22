@@ -190,7 +190,8 @@ bool set_node_as_anchor(bool isInitiator, bool first_run) {
     return false;
   }
   
-  if(!check_configuration(DWM_MODE_ANCHOR, cfg)) {
+  if(!check_configuration(DWM_MODE_TAG, cfg) || cfg.initiator != isInitiator || 
+     cfg.bridge != isInitiator * !first_run) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
