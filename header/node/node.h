@@ -23,18 +23,6 @@ void anchor_scan_thread(uint32_t data);
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg);
 
 /**
- * @brief Create a dwm_pos_t based on receibed parameters.
- *
- * @param[in] x: Position in axis x (mm).
- * @param[in] y: Position in axis y (mm).
- * @param[in] z: Position in axis z (mm).
- * @param[in] quality_factor: Value that determines the quality of the measurements.
- *
- * @return dwm_pos_t
- */
-dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_factor);
-
-/**
  * @brief Search if an id is in the list of neighbors.
  *
  * @param[in] node_id: Id to search.

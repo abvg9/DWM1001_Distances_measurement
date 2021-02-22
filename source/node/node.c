@@ -78,11 +78,13 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
     
     case DWM_MODE_ANCHOR:
 
+      /*
       if(default_anchor_cfg.bridge != cfg.bridge) {
         return false;
       }
+      */
 
-    break;   
+      break;   
 
   }
 
@@ -126,17 +128,6 @@ bool cmp_neighbors_lists(rangin_neighbors loaded_neighbors) {
   return equal;
 }
 
-dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t quality_factor) {
-
-  dwm_pos_t position;
-  position.x = x;
-  position.y = y;
-  position.z = z;
-  position.qf = quality_factor;
-
-  return position;
-}
-
 void message_event_callback(dwm_evt_t *p_evt) {
 
   switch (p_evt->header.id) {
@@ -163,7 +154,7 @@ void message_event_callback(dwm_evt_t *p_evt) {
 
 void message_handler_thread(uint32_t data) {
 
-  /* Register event callback */
+  // Register event callback.
   dwm_evt_listener_register(DWM_EVT_USR_DATA_READY | DWM_EVT_USR_DATA_SENT, NULL);
 
   dwm_evt_t evt;
@@ -222,21 +213,6 @@ bool set_node_as_anchor(bool isInitiator) {
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
-    }
-
-     // Set position.
-    dwm_pos_t pos_get;
-
-    if(!err_check(dwm_pos_get(&pos_get))) {
-      return false;
-    }
-
-    if(pos_get.x != 0 || pos_get.y != 0 || pos_get.z != 0 || pos_get.qf != 100) {
-
-      dwm_pos_t pos_set = create_position(0, 0, 0, 100);
-      if(!err_check(dwm_pos_set(&pos_set))) {
-        return false;
-      }
     }
 
     // To apply changes we need to reset the board.
@@ -307,7 +283,6 @@ dwm_mode_t set_node_mode(uint8_t index) {
       }
 
     }
-
 
   }
 
