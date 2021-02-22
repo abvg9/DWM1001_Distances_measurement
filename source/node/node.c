@@ -182,19 +182,38 @@ int is_there_neighbor(uint16_t node_id) {
 
 }
 
-bool set_node_as_anchor(bool is_initiator) {
+bool set_node_as_anchor(anchor_type type) {
 
   dwm_cfg_t cfg;
 
   if(!err_check(dwm_cfg_get(&cfg))) {
     return false;
   }
+
+  bool is_initiator = false, is_bridge = false;
+
+  switch(type) {
+
+    case initiator:
+      is_initiator = true;
+    break;
+
+    case bridge:
+      is_bridge = true;
+    break;
+
+    default:
+    break;
+
+  }
  
-  if(!check_configuration(DWM_MODE_ANCHOR, cfg) || cfg.initiator != is_initiator) {
+  if(!check_configuration(DWM_MODE_ANCHOR, cfg) || cfg.initiator != is_initiator
+     || cfg.bridge != is_bridge) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
     anchor_cfg.initiator = is_initiator;
+    anchor_cfg.bridge = is_bridge;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -249,7 +268,7 @@ dwm_mode_t set_node_mode(uint8_t index) {
 
   if(index > DWM_RANGING_ANCHOR_CNT_MAX+1 || index == get_nvm_uint8_variable(initiator_index)) {
 
-    if(set_node_as_anchor(true)) {
+    if(set_node_as_anchor(initiator)) {
       return DWM_MODE_ANCHOR;
     }
 
@@ -261,11 +280,13 @@ dwm_mode_t set_node_mode(uint8_t index) {
 
   } else if(index == get_nvm_uint8_variable(bridge_index)) {
 
-    
+    if(set_node_as_anchor(bridge)) {
+      return DWM_MODE_ANCHOR;
+    }
 
   } else {
 
-    if(set_node_as_anchor(false)) {
+    if(set_node_as_anchor(normal)) {
       return DWM_MODE_ANCHOR;
     }
 

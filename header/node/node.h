@@ -4,6 +4,15 @@
 #include "nvm.h"
 #include <stdio.h>
 
+/*********
+ * ENUMS *
+ *********/
+typedef enum {
+  normal,
+  initiator,
+  bridge,
+} anchor_type;
+
 /*************
  * FUNCTIONS *
  *************/
@@ -44,7 +53,7 @@ void message_handler_thread(uint32_t data);
  * @retval true If the node could be configured as anchor.
  * @retval false If the node could not be configured as anchor.
  */
-bool set_node_as_anchor(bool is_initiator);
+bool set_node_as_anchor(anchor_type type);
 
 /**
  * @brief Set anchor configuration to the tag.
