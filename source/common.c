@@ -1,23 +1,35 @@
 #include "common.h"
 
-bool err_check(int err_code) {
+bool err_check(const int err_code) {
   return err_code == DWM_OK;
 }
 
-void blink_led_thread(int pin_led, int loops, float seconds) {
+bool blink_led(uint32_t data) {
 
-    // Set as output and turn off the led.
-    dwm_gpio_cfg_output(pin_led, true);
+  blink_led_struct* led_information = (blink_led_struct*)data;
 
-    int i;
+  if(!err_check(dwm_gpio_cfg_output(led_information->pin, true))) {
+    return false;
+  }
 
-    for(i = 0; i < loops; ++i) {
+  int i;
+  bool endless_loop = led_information->loops < 0;
 
-      dwm_gpio_value_set(pin_led, false);
-      dwm_thread_delay(ONE_SECOND*seconds);
+  for(i = 0; i < led_information->loops || endless_loop; ++i) {
 
-      dwm_gpio_value_set(pin_led, true);
-      dwm_thread_delay(ONE_SECOND*seconds);
+    if(!err_check(dwm_gpio_value_set(led_information->pin, false))) {
+      return false;
     }
 
+    dwm_thread_delay(ONE_SECOND*led_information->seconds);
+
+    if(!err_check(dwm_gpio_value_set(led_information->pin, true))) {
+      return false;
+    }
+
+    dwm_thread_delay(ONE_SECOND*led_information->seconds);
+
+  }
+
+  return true;
 }
