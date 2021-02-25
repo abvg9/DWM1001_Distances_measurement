@@ -14,13 +14,10 @@
  ********/
 typedef enum {
   blue_led = DWM_GPIO_IDX_31,
-  gree_led = DWM_GPIO_IDX_30,
+  green_led = DWM_GPIO_IDX_30,
   red_led = DWM_GPIO_IDX_22,
-  re1_led = DWM_GPIO_IDX_14,
+  red1_led = DWM_GPIO_IDX_14,
 } led_pin;
-
-#define LED_ON(led_pin)  dwm_gpio_value_set(led_pin, true)
-#define LED_OFF(led_pin) dwm_gpio_value_set(led_pin, false)
 
 /***********
  * THREADS *

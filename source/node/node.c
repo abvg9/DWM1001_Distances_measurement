@@ -164,6 +164,22 @@ bool set_node_as_anchor(bool is_initiator) {
 
   }
 
+  if(!err_check(dwm_gpio_cfg_output(blue_led, true))) {
+    return false;
+  }
+
+  if(!err_check(dwm_gpio_value_set(blue_led, false))) {
+    return false;
+  }
+
+  if(!err_check(dwm_gpio_cfg_output(red1_led, true))) {
+    return false;
+  }
+
+  if(!err_check(dwm_gpio_value_set(red1_led, !is_initiator))) {
+      return false;
+  }
+
   return true;
 }
 
@@ -187,6 +203,14 @@ bool set_node_as_tag(void) {
     // To apply changes we need to reset the board.
     dwm_reset();
 
+  }
+
+  if(!err_check(dwm_gpio_cfg_output(green_led, true))) {
+    return false;
+  }
+
+  if(!err_check(dwm_gpio_value_set(green_led, false))) {
+      return false;
   }
   
   return true;
