@@ -299,7 +299,7 @@ void wait_tag_thread(uint32_t data) {
 
   dwm_anchor_list_t anchors_list;
 
-  uint16_t tag_id = get_nvm_uint8_variable(tag_index);
+  uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
   bool tag_no_ended = true;
 
   do {
