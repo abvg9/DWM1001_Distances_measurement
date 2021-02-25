@@ -46,7 +46,7 @@ int dwm_user_start(void) {
       return -1;
     }
 
-    if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index > DWM_RANGING_ANCHOR_CNT_MAX+1)) {
+    if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index > DWM_RANGING_ANCHOR_CNT_MAX)) {
 
       uint8_t scan_neighbors_hndl;
 

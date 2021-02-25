@@ -218,7 +218,7 @@ bool set_node_as_tag(void) {
 
 dwm_mode_t select_node_mode(uint8_t index) {
 
-  if(index > DWM_RANGING_ANCHOR_CNT_MAX || index == get_nvm_uint8_variable(initiator_index)) {
+  if(index == get_nvm_uint8_variable(initiator_index)) {
 
     if(set_node_as_anchor(true)) {
       return DWM_MODE_ANCHOR;
