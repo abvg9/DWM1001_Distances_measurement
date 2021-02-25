@@ -9,41 +9,34 @@ const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
 extern rangin_neighbors neighbors;
 
-void anchor_scan_thread(uint32_t data) {
+void scan_neighbors_thread(uint32_t data) {
 
   dwm_anchor_list_t anchors_list;
-  anchors_list.cnt = 0;
 
-  while(neighbors.cnt != NET_NUM_NODES-1) {
+  do {
 
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
-      if(anchors_list.cnt > 0) {
-
-        blink_led_thread(BLUE_LED, anchors_list.cnt, 1);
-        blink_led_thread(GREEN_LED, 1, 1);
-
-        int i;
-        for(i = 0; i < anchors_list.cnt; ++i) {
-          store_neighbor(anchors_list.v[i].node_id);
-        }
-      }else {
-        blink_led_thread(RED1_LED, 1, 1);
+      int i;
+      for(i = 0; i < anchors_list.cnt; ++i) {
+        store_neighbor(anchors_list.v[i].node_id);
       }
+
     }
 
-  }
+  } while(neighbors.cnt != NET_NUM_NODES-1);
 
   uint64_t node_id;
   dwm_node_id_get(&node_id);
 
   // Get the last 16 bits, the node id.
-  node_id &= 0X000000000000FFFF;
+  node_id &= 0xffff;
 
   store_neighbor(node_id);
   set_nvm_uint8_variable(my_neighbor_index, is_there_neighbor(node_id));
 
   store_neighbors(neighbors);
+
   dwm_reset();
 
 }
@@ -69,6 +62,12 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
     }
 
     if(default_tag_cfg.loc_engine_en != cfg.loc_engine_en) {
+      return false;
+    }
+
+  } else {
+
+    if(default_anchor_cfg.bridge != cfg.bridge) {
       return false;
     }
 
@@ -114,46 +113,6 @@ bool cmp_neighbors_lists(rangin_neighbors loaded_neighbors) {
   return equal;
 }
 
-void message_event_callback(dwm_evt_t *p_evt) {
-
-  switch (p_evt->header.id) {
-
-    case DWM_EVT_USR_DATA_READY:
-      blink_led_thread(BLUE_LED, 1, 3);
-      blink_led_thread(GREEN_LED, 1, 3);
-      // p_evt->usr_data[i]
-      update_state();
-    break;
-
-    case DWM_EVT_USR_DATA_SENT:
-      blink_led_thread(BLUE_LED, 2, 3);
-      blink_led_thread(GREEN_LED, 1, 3);
-    break;
-
-    default:
-      blink_led_thread(BLUE_LED, 3, 3);
-      blink_led_thread(GREEN_LED, 1, 3);
-    break;
-  }
-
-}
-
-void message_handler_thread(uint32_t data) {
-
-  // Register event callback.
-  dwm_evt_listener_register(DWM_EVT_USR_DATA_READY | DWM_EVT_USR_DATA_SENT, NULL);
-
-  dwm_evt_t evt;
-
-  while (true) {
-
-    if(err_check(dwm_evt_wait(&evt))) {
-      message_event_callback(&evt);
-    }
-  }
-
-}
-
 int is_there_neighbor(uint16_t node_id) {
 
   if(neighbors.cnt == 0) {
@@ -182,7 +141,7 @@ int is_there_neighbor(uint16_t node_id) {
 
 }
 
-bool set_node_as_anchor(anchor_type type) {
+bool set_node_as_anchor(bool is_initiator) {
 
   dwm_cfg_t cfg;
 
@@ -190,30 +149,11 @@ bool set_node_as_anchor(anchor_type type) {
     return false;
   }
 
-  bool is_initiator = false, is_bridge = false;
-
-  switch(type) {
-
-    case initiator:
-      is_initiator = true;
-    break;
-
-    case bridge:
-      is_bridge = true;
-    break;
-
-    default:
-    break;
-
-  }
- 
-  if(!check_configuration(DWM_MODE_ANCHOR, cfg) || cfg.initiator != is_initiator
-     || cfg.bridge != is_bridge) {
+  if(!check_configuration(DWM_MODE_ANCHOR, cfg) || cfg.initiator != is_initiator) {
 
     dwm_cfg_anchor_t anchor_cfg = default_anchor_cfg;
     anchor_cfg.common = default_common_cfg;
     anchor_cfg.initiator = is_initiator;
-    anchor_cfg.bridge = is_bridge;
 
     if(!err_check(dwm_cfg_anchor_set(&anchor_cfg))) {
       return false;
@@ -237,18 +177,6 @@ bool set_node_as_tag(void) {
   
   if(!check_configuration(DWM_MODE_TAG, cfg)) {
 
-    // Update rate set to 1 second, stationary update rate set to 5 seconds.
-    /*
-    if(!err_check(dwm_upd_rate_set(10, 10))) {
-      return false;
-    }
-
-    // Sensitivity for switching between stationary and normal update rate.
-    if(!err_check(dwm_stnry_cfg_set(DWM_STNRY_SENSITIVITY_NORMAL))) {
-      return false;
-    }
-    */
- 
     dwm_cfg_tag_t tag_cfg = default_tag_cfg;
     tag_cfg.common = default_common_cfg;
 
@@ -264,11 +192,11 @@ bool set_node_as_tag(void) {
   return true;
 }
 
-dwm_mode_t set_node_mode(uint8_t index) {
+dwm_mode_t select_node_mode(uint8_t index) {
 
-  if(index > DWM_RANGING_ANCHOR_CNT_MAX+1 || index == get_nvm_uint8_variable(initiator_index)) {
+  if(index > DWM_RANGING_ANCHOR_CNT_MAX || index == get_nvm_uint8_variable(initiator_index)) {
 
-    if(set_node_as_anchor(initiator)) {
+    if(set_node_as_anchor(true)) {
       return DWM_MODE_ANCHOR;
     }
 
@@ -278,15 +206,9 @@ dwm_mode_t set_node_mode(uint8_t index) {
       return DWM_MODE_TAG;
     }
 
-  } else if(index == get_nvm_uint8_variable(bridge_index)) {
-
-    if(set_node_as_anchor(bridge)) {
-      return DWM_MODE_ANCHOR;
-    }
-
   } else {
 
-    if(set_node_as_anchor(normal)) {
+    if(set_node_as_anchor(false)) {
       return DWM_MODE_ANCHOR;
     }
 
@@ -318,21 +240,22 @@ void store_neighbor(uint64_t node_id) {
 
 }
 
-void tag_scan_thread(uint32_t data) {
+void get_anchor_distances_thread(uint32_t data) {
 
   dwm_loc_data_t loc;
 
   do {
     dwm_loc_get(&loc);
-  } while(loc.anchors.dist.cnt != NET_NUM_NODES-2);
+  } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
 
 
   /* TODO */
   // ENVIAMOS DISTANCIAS A LA CONTROLADORA.
-
-  // AVISAMOS AL RESTO DE NODOS DE QUE TODOS DEBEN AVANZAR DE ESTADO.
-  uint8_t message[DWM_USR_DATA_LEN_MAX];
-  dwm_usr_data_write(message, DWM_USR_DATA_LEN_MAX, false);
+  int i;
+  for(i = 0; i < loc.anchors.dist.cnt; ++i) {
+    printf("Node id: 0x%04X\n", (unsigned int)loc.anchors.dist.addr[i]);
+    printf("Distance in mm: %lu\n", loc.anchors.dist.dist[i]);
+  }
 
   update_state();
 }
@@ -341,11 +264,32 @@ void update_state(void) {
 
   uint8_t i_index = get_nvm_uint8_variable(initiator_index) + 1;
   uint8_t t_index = get_nvm_uint8_variable(tag_index) + 1;
-  uint8_t b_index = get_nvm_uint8_variable(bridge_index) + 1;
 
   set_nvm_uint8_variable(initiator_index, i_index%neighbors.cnt);
   set_nvm_uint8_variable(tag_index, t_index%neighbors.cnt);
-  set_nvm_uint8_variable(bridge_index, b_index%neighbors.cnt);
 
   dwm_reset();
+}
+
+void wait_tag_thread(uint32_t data) {
+
+  dwm_anchor_list_t anchors_list;
+
+  uint16_t tag_id = get_nvm_uint8_variable(tag_index);
+  bool tag_no_ended = true;
+
+  do {
+
+    if(err_check(dwm_anchor_list_get(&anchors_list))) {
+
+      int i = 0;
+      while(i < anchors_list.cnt && (tag_no_ended = (anchors_list.v[i].node_id != tag_id))) {
+        i++;
+      }
+     
+    }
+
+  } while(tag_no_ended);
+  
+  update_state();
 }

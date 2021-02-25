@@ -1,9 +1,5 @@
 #include "common.h"
 
-bool err_check(const int err_code) {
-  return err_code == DWM_OK;
-}
-
 bool blink_led(uint32_t data) {
 
   blink_led_struct* led_information = (blink_led_struct*)data;
@@ -32,4 +28,8 @@ bool blink_led(uint32_t data) {
   }
 
   return true;
+}
+
+bool err_check(const int err_code) {
+  return err_code == DWM_OK;
 }

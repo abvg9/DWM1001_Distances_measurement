@@ -4,8 +4,7 @@
 rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
-#define FLUSH_MEMORY false
-const uint16_t PANID = 0xDECA;
+#define FLUSH_MEMORY true
 
 int dwm_user_start(void) {
 
@@ -19,12 +18,10 @@ int dwm_user_start(void) {
   }
 
   if(FLUSH_MEMORY) {
-    set_zeros_nvm(nvm);
-  } else {
 
-    if(!err_check(dwm_panid_set(PANID))) {
-      return -1;
-    }
+    flush_nvm(nvm);
+
+  } else {
 
     if(!check_nvm_validity(nvm)) {
 
@@ -38,7 +35,7 @@ int dwm_user_start(void) {
 
     uint8_t index = get_nvm_uint8_variable(my_neighbor_index);
 
-    dwm_mode_t mode = set_node_mode(index);
+    dwm_mode_t mode = select_node_mode(index);
 
     if(mode == -1) {
       return -1;
@@ -46,44 +43,45 @@ int dwm_user_start(void) {
 
     if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index > DWM_RANGING_ANCHOR_CNT_MAX+1)) {
 
-      // Anchor scan thread
-      uint8_t anchor_scan_hndl;
+      uint8_t scan_neighbors_hndl;
 
-      if(!err_check(dwm_thread_create(THREAD_PRIO, anchor_scan_thread, (void*)NULL,
-                    "Scan_anchors", THREAD_STACK_SIZE, &anchor_scan_hndl))) {
+      if(!err_check(dwm_thread_create(THREAD_PRIO, scan_neighbors_thread, (void*)NULL,
+                    "scan_neighbors", THREAD_STACK_SIZE, &scan_neighbors_hndl))) {
         return -1;
       }
 
-      if(!err_check(dwm_thread_resume(anchor_scan_hndl))) {
+      if(!err_check(dwm_thread_resume(scan_neighbors_hndl))) {
         return -1;
       }
 
     } else if(index == get_nvm_uint8_variable(tag_index)) {
 
-      // Tag scan thread
-      uint8_t tag_scan_hndl;
+      uint8_t get_anchor_distances_hndl;
 
-      if(!err_check(dwm_thread_create(THREAD_PRIO, tag_scan_thread, (void*)NULL,
-                      "Get_distances_to_anchors", THREAD_STACK_SIZE, &tag_scan_hndl))) {
+      if(!err_check(dwm_thread_create(THREAD_PRIO, get_anchor_distances_thread, (void*)NULL,
+                      "Get_distances_to_anchors", THREAD_STACK_SIZE, &get_anchor_distances_hndl))) {
         return -1;
       }
 
-      if(!err_check(dwm_thread_resume(tag_scan_hndl))) {
+      if(!err_check(dwm_thread_resume(get_anchor_distances_hndl))) {
         return -1;
       }
+
+    } else {
+
+      uint8_t wait_tag_hndl;
+
+      if(!err_check(dwm_thread_create(THREAD_PRIO, wait_tag_thread, (void*)NULL,
+                    "wait_tag", THREAD_STACK_SIZE, &wait_tag_hndl))) {
+        return -1;
+      }
+
+      if(!err_check(dwm_thread_resume(wait_tag_hndl))) {
+        return -1;
+      }
+
     }
 
-    // Event thread
-    uint8_t message_event_hndl;
-
-    if(!err_check(dwm_thread_create(THREAD_PRIO, message_handler_thread, (void*)NULL,
-                      "Message_handler", THREAD_STACK_SIZE, &message_event_hndl))) {
-      return -1;
-    }
-
-    if(!err_check(dwm_thread_resume(message_event_hndl))) {
-      return -1;
-    }
   }
 
   return 0;

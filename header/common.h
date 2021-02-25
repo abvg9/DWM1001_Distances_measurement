@@ -49,17 +49,6 @@ typedef struct {
  *************/
 
 /**
- * @brief Check if a dwm api function return an error code or not.
- *
- * @param[in] err_code: Return value of a dwm function.
- *
- * @return bool
- * @retval true If the return value is not an error code.
- * @retval false If the return value is an error code.
- */
-bool err_check(const int err_code);
-
-/**
  * @brief Makes a led blink.
  *
  * @note This function only works if it is called in the context of a thread.
@@ -81,5 +70,16 @@ bool err_check(const int err_code);
  * @retval false If dwm_gpio_value_set return an error code.
  */
 bool blink_led(uint32_t data);
+
+/**
+ * @brief Check if a dwm api function return an error code or not.
+ *
+ * @param[in] err_code: Return value of a dwm function.
+ *
+ * @return bool
+ * @retval true If the return value is not an error code.
+ * @retval false If the return value is an error code.
+ */
+bool err_check(const int err_code);
 
 #endif // COMMON
