@@ -79,7 +79,8 @@ rangin_neighbors load_neighbors(void) {
     // an id, we need to load two positions of the nvm.
     for(i = 0, j = 0; i < neighbors.cnt*2; i+=2, ++j) {
         neighbors.node_ids[j] = 
-          ((uint64_t) nvm[neighbors_start_address + i] << 8) | nvm[neighbors_start_address + i + 1];
+          ((uint64_t) nvm[neighbors_start_address + i] << 8) | 
+          nvm[neighbors_start_address + i + 1];
     }
   }
 

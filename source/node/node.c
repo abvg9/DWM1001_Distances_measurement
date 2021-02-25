@@ -26,8 +26,6 @@ void scan_neighbors_thread(uint32_t data) {
 
   } while(neighbors.cnt != NET_NUM_NODES-1);
 
-  dwm_thread_delay(ONE_SECOND*10);
-
   uint64_t node_id;
   dwm_node_id_get(&node_id);
 
@@ -302,23 +300,19 @@ void wait_tag_thread(uint32_t data) {
   dwm_anchor_list_t anchors_list;
 
   uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
-  uint16_t my_id = neighbors.node_ids[get_nvm_uint8_variable(my_neighbor_index)];
+  //uint16_t my_id = neighbors.node_ids[get_nvm_uint8_variable(my_neighbor_index)];
 
-  bool tag_no_ended = true;
+  bool tag_no_ended;
 
-  do {
+  if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
-    if(err_check(dwm_anchor_list_get(&anchors_list))) {
-
-      int i = 0;
-      while(i < anchors_list.cnt && (tag_no_ended = (anchors_list.v[i].node_id != tag_id)
-            && anchors_list.v[i].node_id != my_id)) {
-        i++;
-      }
-     
-    }
-
-  } while(tag_no_ended);
+    int i = -1;
+    do {
+      i++;
+      tag_no_ended = (anchors_list.v[i].node_id != tag_id);
+    } while(i < anchors_list.cnt && tag_no_ended);
+   
+  }
   
   update_state();
 }
