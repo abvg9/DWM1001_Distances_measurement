@@ -278,7 +278,7 @@ void get_anchor_distances_thread(uint32_t data) {
   int i;
   for(i = 0; i < loc.anchors.dist.cnt; ++i) {
     printf("Node id: 0x%04X\n", (unsigned int)loc.anchors.dist.addr[i]);
-    printf("Distance in mm: %lu\n", loc.anchors.dist.dist[i]);
+    printf("Distance: %lu mm\n", loc.anchors.dist.dist[i]);
   }
 
   update_state();
@@ -300,6 +300,8 @@ void wait_tag_thread(uint32_t data) {
   dwm_anchor_list_t anchors_list;
 
   uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
+  uint16_t my_id = neighbors.node_ids[get_nvm_uint8_variable(my_neighbor_index)];
+
   bool tag_no_ended = true;
 
   do {
@@ -307,7 +309,8 @@ void wait_tag_thread(uint32_t data) {
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
       int i = 0;
-      while(i < anchors_list.cnt && (tag_no_ended = (anchors_list.v[i].node_id != tag_id))) {
+      while(i < anchors_list.cnt && (tag_no_ended = (anchors_list.v[i].node_id != tag_id)
+            && anchors_list.v[i].node_id != my_id)) {
         i++;
       }
      
