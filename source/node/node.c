@@ -298,21 +298,22 @@ void update_state(void) {
 void wait_tag_thread(uint32_t data) {
 
   dwm_anchor_list_t anchors_list;
+  anchors_list.cnt = -2;
 
   uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
   //uint16_t my_id = neighbors.node_ids[get_nvm_uint8_variable(my_neighbor_index)];
 
-  bool tag_no_ended;
+  bool tag_no_ended = true;
 
-  if(err_check(dwm_anchor_list_get(&anchors_list))) {
-
-    int i = -1;
-    do {
+  int i = -1;
+  do {
+    if(err_check(dwm_anchor_list_get(&anchors_list))) {
       i++;
       tag_no_ended = (anchors_list.v[i].node_id != tag_id);
-    } while(i < anchors_list.cnt && tag_no_ended);
+    }
+  } while(i < anchors_list.cnt && tag_no_ended);
    
-  }
+  
   
   update_state();
 }
