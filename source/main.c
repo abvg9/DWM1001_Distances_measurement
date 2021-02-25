@@ -6,7 +6,6 @@ rangin_neighbors neighbors;
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
 #define FLUSH_MEMORY false
 #define PAIND 0xDECA
-const bool INITIAL_INITIATOR = true;
 
 int dwm_user_start(void) {
 
@@ -47,7 +46,7 @@ int dwm_user_start(void) {
       return -1;
     }
 
-    if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index > DWM_RANGING_ANCHOR_CNT_MAX)) {
+    if(mode == DWM_MODE_ANCHOR && (neighbors.cnt == 0 || index >= DWM_RANGING_ANCHOR_CNT_MAX)) {
 
       uint8_t scan_neighbors_hndl;
 

@@ -178,7 +178,7 @@ bool set_node_as_anchor(bool is_initiator) {
   }
 
   if(!err_check(dwm_gpio_value_set(red1_led, !is_initiator))) {
-      return false;
+    return false;
   }
 
   return true;
@@ -211,7 +211,7 @@ bool set_node_as_tag(void) {
   }
 
   if(!err_check(dwm_gpio_value_set(green_led, false))) {
-      return false;
+    return false;
   }
   
   return true;
@@ -219,7 +219,7 @@ bool set_node_as_tag(void) {
 
 dwm_mode_t select_node_mode(uint8_t index) {
 
-  if(INITIAL_INITIATOR || index == get_nvm_uint8_variable(initiator_index)) {
+  if(index >= DWM_RANGING_ANCHOR_CNT_MAX || index == get_nvm_uint8_variable(initiator_index)) {
 
     if(set_node_as_anchor(true)) {
       return DWM_MODE_ANCHOR;
