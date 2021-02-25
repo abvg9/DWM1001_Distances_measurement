@@ -3,11 +3,12 @@
 /*******************************
  * DEFAULT NODE CONFIGURATIONS *
  *******************************/
-const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, false, false};
+const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, false, false};
 const dwm_cfg_tag_t default_tag_cfg = {{}, false, false, false, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
 extern rangin_neighbors neighbors;
+extern const bool INITIAL_INITIATOR;
 
 void scan_neighbors_thread(uint32_t data) {
 
@@ -79,10 +80,6 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
   }
 
   if(cfg.common.enc_en != default_common_cfg.enc_en) {
-    return false;
-  }
-
-  if(cfg.common.fw_update_en != default_common_cfg.fw_update_en) {
     return false;
   }
 
@@ -218,7 +215,7 @@ bool set_node_as_tag(void) {
 
 dwm_mode_t select_node_mode(uint8_t index) {
 
-  if(index > DWM_RANGING_ANCHOR_CNT_MAX || index == get_nvm_uint8_variable(initiator_index)) {
+  if(INITIAL_INITIATOR || index == get_nvm_uint8_variable(initiator_index)) {
 
     if(set_node_as_anchor(true)) {
       return DWM_MODE_ANCHOR;
