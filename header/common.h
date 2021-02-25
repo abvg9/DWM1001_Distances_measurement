@@ -7,7 +7,7 @@
 /*******
  * NET *
  *******/
-#define NET_NUM_NODES 3
+#define NET_NUM_NODES 2
 
 /********
  * LEDS *

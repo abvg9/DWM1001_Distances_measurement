@@ -5,6 +5,7 @@ rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
 #define FLUSH_MEMORY false
+#define PAIND 0xABCD
 
 int dwm_user_start(void) {
 
@@ -22,6 +23,10 @@ int dwm_user_start(void) {
     flush_nvm(nvm);
 
   } else {
+
+    if(!err_check(dwm_panid_set(PAIND))) {
+      return false;
+    }
 
     if(!check_nvm_validity(nvm)) {
 
