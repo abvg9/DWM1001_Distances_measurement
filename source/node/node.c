@@ -3,7 +3,7 @@
 /*******************************
  * DEFAULT NODE CONFIGURATIONS *
  *******************************/
-const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, true, false, false, false};
+const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, false, false};
 const dwm_cfg_tag_t default_tag_cfg = {{}, false, false, false, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
@@ -79,6 +79,10 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
   }
 
   if(cfg.common.enc_en != default_common_cfg.enc_en) {
+    return false;
+  }
+
+  if(cfg.common.fw_update_en != default_common_cfg.fw_update_en) {
     return false;
   }
 
@@ -191,7 +195,6 @@ bool set_node_as_tag(void) {
 
     dwm_cfg_tag_t tag_cfg = default_tag_cfg;
     tag_cfg.common = default_common_cfg;
-    tag_cfg.common.fw_update_en = false;
 
     if(!err_check(dwm_cfg_tag_set(&tag_cfg))) {
       return false;
@@ -295,7 +298,6 @@ void update_state(void) {
 void wait_tag_thread(uint32_t data) {
 
   dwm_anchor_list_t anchors_list;
-  anchors_list.cnt = -2;
 
   uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
   //uint16_t my_id = neighbors.node_ids[get_nvm_uint8_variable(my_neighbor_index)];
@@ -309,8 +311,6 @@ void wait_tag_thread(uint32_t data) {
       tag_no_ended = (anchors_list.v[i].node_id != tag_id);
     }
   } while(i < anchors_list.cnt && tag_no_ended);
-   
-  
-  
+
   update_state();
 }
