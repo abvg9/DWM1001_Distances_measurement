@@ -26,6 +26,8 @@ void scan_neighbors_thread(uint32_t data) {
 
   } while(neighbors.cnt != NET_NUM_NODES-1);
 
+  dwm_thread_delay(ONE_SECOND*10);
+
   uint64_t node_id;
   dwm_node_id_get(&node_id);
 
