@@ -271,6 +271,8 @@ void store_neighbor(uint64_t node_id) {
 
 void get_anchor_distances_thread(uint32_t data) {
 
+  dwm_loc_data_t loc;
+
   do {
     dwm_loc_get(&loc);
   } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
