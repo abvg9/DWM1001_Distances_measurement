@@ -272,8 +272,10 @@ void store_neighbor(uint64_t node_id) {
 void get_anchor_distances_thread(uint32_t data) {
 
   dwm_loc_data_t loc;
+  blink_led_struct no_got_distances_led = {red1_led, 1, 1.0f};
 
   do {
+    blink_led((uint32_t)&no_got_distances_led);
     dwm_loc_get(&loc);
   } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
 
@@ -312,7 +314,7 @@ void wait_tag_thread(uint32_t data) {
   // If the node was a tag in the last state, it must wait 5 seconds.
   if(get_nvm_uint8_variable(was_a_tag_in_last_state)) {
     set_nvm_uint8_variable(was_a_tag_in_last_state, false);
-    dwm_thread_delay(ONE_SECOND*10);
+    dwm_thread_delay(ONE_SECOND*15);
   }
 
   do {
