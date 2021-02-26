@@ -283,6 +283,9 @@ void get_anchor_distances_thread(uint32_t data) {
     printf("Distance: %lu mm\n", loc.anchors.dist.dist[i]);
   }
 
+  blink_led_struct got_distances_led = {blue_led, 1, 1.0f};
+  blink_led((uint32_t)&got_distances_led);
+
   update_state();
 }
 
