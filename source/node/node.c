@@ -292,6 +292,8 @@ void get_anchor_distances_thread(uint32_t data) {
     printf("Distance: %lu mm\n", loc.anchors.dist.dist[i]);
   }
 
+  dwm_thread_delay(ONE_SECOND*5);
+
   update_state();
 }
 
