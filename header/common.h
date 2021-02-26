@@ -36,9 +36,9 @@ typedef struct {
 } rangin_neighbors;
 
 typedef struct {
-  const led_pin pin;
-  const int loops;
-  const float seconds;
+  led_pin pin;
+  int loops;
+  float seconds;
 } blink_led_struct;
 
 /*************

@@ -12,14 +12,26 @@ extern rangin_neighbors neighbors;
 void scan_neighbors_thread(uint32_t data) {
 
   dwm_anchor_list_t anchors_list;
+  blink_led_struct no_anchors_found_led = {red1_led, 1, 1.0f};
+  blink_led_struct anchors_found_led = {green_led, 0, 1.0f};
 
   do {
 
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
-      int i;
-      for(i = 0; i < anchors_list.cnt; ++i) {
-        store_neighbor(anchors_list.v[i].node_id);
+      if(anchors_list.cnt > 0) {
+
+        anchors_found_led.loops = anchors_list.cnt;
+        blink_led((uint32_t)&anchors_found_led);
+        blink_led((uint32_t)&no_anchors_found_led);
+
+        int i;
+        for(i = 0; i < anchors_list.cnt; ++i) {
+          store_neighbor(anchors_list.v[i].node_id);
+        }
+
+      } else {
+        blink_led((uint32_t)&no_anchors_found_led);
       }
 
     }
@@ -169,14 +181,6 @@ bool set_node_as_anchor(bool is_initiator) {
   }
 
   if(!err_check(dwm_gpio_value_set(blue_led, false))) {
-    return false;
-  }
-
-  if(!err_check(dwm_gpio_cfg_output(red1_led, true))) {
-    return false;
-  }
-
-  if(!err_check(dwm_gpio_value_set(red1_led, !is_initiator))) {
     return false;
   }
 
