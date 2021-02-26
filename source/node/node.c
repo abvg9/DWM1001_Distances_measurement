@@ -199,7 +199,7 @@ bool set_node_as_tag(void) {
 
     dwm_cfg_tag_t tag_cfg = default_tag_cfg;
     tag_cfg.common = default_common_cfg;
-    tag_cfg.common.fw_update_en = false;
+    set_nvm_uint8_variable(was_a_tag_in_last_state, true);
 
     if(!err_check(dwm_cfg_tag_set(&tag_cfg))) {
       return false;
@@ -277,8 +277,6 @@ void get_anchor_distances_thread(uint32_t data) {
     dwm_loc_get(&loc);
   } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
 
-  /* TODO */
-  // ENVIAMOS DISTANCIAS A LA CONTROLADORA.
   int i;
   for(i = 0; i < loc.anchors.dist.cnt; ++i) {
     printf("Node id: 0x%04X\n", (unsigned int)loc.anchors.dist.addr[i]);
@@ -304,10 +302,15 @@ void wait_tag_thread(uint32_t data) {
   dwm_anchor_list_t anchors_list;
   uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
   bool tag_no_ended = true;
-
+  blink_led_struct no_tag_founded_led = {red1_led, 1, 1.0f};
+  blink_led_struct tag_founded_led = {green_led, 1, 1.0f};
   int i;
 
-  dwm_thread_delay(ONE_SECOND*3);
+  // If the node was a tag in the last state, it must wait 5 seconds.
+  if(get_nvm_uint8_variable(was_a_tag_in_last_state)) {
+    set_nvm_uint8_variable(was_a_tag_in_last_state, false);
+    dwm_thread_delay(ONE_SECOND*5);
+  }
 
   do {
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
@@ -315,10 +318,15 @@ void wait_tag_thread(uint32_t data) {
       for(i = 0; i < anchors_list.cnt && tag_no_ended; ++i) {
         tag_no_ended = (anchors_list.v[i].node_id != tag_id);
       }
+
+      if(tag_no_ended) {
+        blink_led((uint32_t)&no_tag_founded_led);
+      } else {
+        blink_led((uint32_t)&tag_founded_led);
+      }
    
     }
   } while(tag_no_ended);
-
 
   update_state();
 }

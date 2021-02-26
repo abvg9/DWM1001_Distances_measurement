@@ -28,7 +28,8 @@ bool clean_memory(uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX]) {
   nvm[number_of_scanned_neighbors] = 0;
   nvm[tag_index] = 0;
   nvm[my_neighbor_index] = 0xFF;
-
+  nvm[was_a_tag_in_last_state] = false;
+  
   return err_check(dwm_nvm_usr_data_set(nvm, DWM_NVM_USR_DATA_LEN_MAX));
 }
 
