@@ -5,7 +5,7 @@ rangin_neighbors neighbors;
 
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
 #define FLUSH_MEMORY false
-#define PAIND 0xDADA
+#define PAIND 0xDECA
 
 int dwm_user_start(void) {
 

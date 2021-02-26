@@ -271,17 +271,8 @@ void store_neighbor(uint64_t node_id) {
 
 void get_anchor_distances_thread(uint32_t data) {
 
-  dwm_loc_data_t loc;
-  blink_led_struct got_distances_led = {blue_led, 0, 1.0f};
-  blink_led_struct no_got_distances_led = {red1_led, 1, 1.0f};
-
   do {
     dwm_loc_get(&loc);
-
-    got_distances_led.loops = loc.anchors.dist.cnt;
-    blink_led((uint32_t)&got_distances_led);
-    blink_led((uint32_t)&no_got_distances_led);
-
   } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
 
   /* TODO */
@@ -312,12 +303,9 @@ void wait_tag_thread(uint32_t data) {
   uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
   bool tag_no_ended = true;
 
-  blink_led_struct no_tag_founded_led = {red1_led, 1, 1.0f};
-  blink_led_struct tag_founded_led = {green_led, 1, 1.0f};
-
   int i;
 
-  dwm_thread_delay(ONE_SECOND*5);
+  dwm_thread_delay(ONE_SECOND*3);
 
   do {
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
@@ -325,16 +313,10 @@ void wait_tag_thread(uint32_t data) {
       for(i = 0; i < anchors_list.cnt && tag_no_ended; ++i) {
         tag_no_ended = (anchors_list.v[i].node_id != tag_id);
       }
-
-      if(tag_no_ended) {
-        blink_led((uint32_t)&no_tag_founded_led);
-      }
-    
+   
     }
   } while(tag_no_ended);
 
-  blink_led((uint32_t)&tag_founded_led);
-  blink_led((uint32_t)&no_tag_founded_led);
 
   update_state();
 }
