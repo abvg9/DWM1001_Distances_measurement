@@ -319,8 +319,6 @@ void wait_tag_thread(uint32_t data) {
 
   dwm_thread_delay(ONE_SECOND*5);
 
-  if(get_nvm_uint8_variable(tag_index)
-
   do {
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
