@@ -292,8 +292,6 @@ void get_anchor_distances_thread(uint32_t data) {
     printf("Distance: %lu mm\n", loc.anchors.dist.dist[i]);
   }
 
-  dwm_thread_delay(ONE_SECOND*5);
-
   update_state();
 }
 
@@ -318,6 +316,10 @@ void wait_tag_thread(uint32_t data) {
   blink_led_struct tag_founded_led = {green_led, 1, 1.0f};
 
   int i;
+
+  dwm_thread_delay(ONE_SECOND*5);
+
+  if(get_nvm_uint8_variable(tag_index)
 
   do {
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
