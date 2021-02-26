@@ -6,6 +6,7 @@ rangin_neighbors neighbors;
 // ORDENES QUE VENDRÁN DE LA CONTROLADORA
 #define FLUSH_MEMORY false
 #define PAIND 0xDECA
+const bool INITIAL_INITIATOR = true;
 
 int dwm_user_start(void) {
 
