@@ -314,7 +314,7 @@ void wait_tag_thread(uint32_t data) {
   // If the node was a tag in the last state, it must wait 5 seconds.
   if(get_nvm_uint8_variable(was_a_tag_in_last_state)) {
     set_nvm_uint8_variable(was_a_tag_in_last_state, false);
-    dwm_thread_delay(ONE_SECOND*15);
+    dwm_thread_delay(ONE_SECOND*12);
   }
 
   do {
