@@ -367,7 +367,7 @@ void wait_tag_thread(uint32_t data) {
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
       for(i = 0; i < anchors_list.cnt && tag_no_ended; ++i) {
-        tag_no_ended = (anchors_list.v[i].node_id != tag_id) 
+        tag_no_ended = (anchors_list.v[i].node_id != tag_id);
         
         if(tag_no_ended) {
           tag_no_ended = !(anchors_list.v[i].x == tag_got_distances);
