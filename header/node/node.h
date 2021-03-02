@@ -20,12 +20,46 @@
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg);
 
 /**
- * @brief Loop until all the anchor of the net are finded.
+ * @brief Check if a given two positions their coordinates are equal.
+ *
+ * @param[in] a: Position to compare.
+ * @param[in] b: The other position to compare.
+ *
+ * @return bool
+ * @retval true If the two positions are equal.
+ * @retval false If the two positions are not equal.
+ */
+bool cmp_positions(dwm_pos_t a, dwm_pos_t b);
+
+/**
+ * @brief Create a dwm_pos_t struct given the coordinates and the qf.
+ *
+ * @param[in] x: Coordinate in the cartesian axis X.
+ * @param[in] y: Coordinate in the cartesian axis Y.
+ * @param[in] z: Coordinate in the cartesian axis Z.
+ * @param[in] qf: Quality of the coordinates.
+ *
+ * @return dwm_pos_t
+ */
+dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t qf);
+
+/**
+ * @brief Loop until all the anchors of the net are finded.
  *
  * @param[in] data: Pointer to the parameters of the function
- *
  */
 void get_anchor_distances_thread(uint32_t data);
+
+/**
+ * @brief Check if all the scanned anchors scanned the other anchors.
+ *
+ * @param[in] dwm_anchor_list_t: List of the scanned anchors.
+ *
+ * @return bool
+ * @retval true If all the scanned anchors scanned the other anchors.
+ * @retval false If not all the scanned anchors scanned the other anchors.
+ */
+bool is_anchor_scan_finished(dwm_anchor_list_t anchors_list);
 
 /**
  * @brief Search if an id is in the list of neighbors.
@@ -79,6 +113,15 @@ bool set_node_as_anchor(bool is_initiator);
 bool set_node_as_tag(void);
 
 /**
+ * @brief Set position to the node.
+ *
+ * @return bool
+ * @retval true If the position can be set.
+ * @retval false If the position can not be set.
+ */
+bool set_position(dwm_pos_t pos);
+
+/**
  * @brief Store id in the list of neighbors.
  *
  * @param[in] node_id: Id to store.
@@ -92,6 +135,11 @@ void store_neighbor(uint64_t node_id);
  */
 void update_state(void);
 
+/**
+ * @brief Loop until the tag of the net are finded.
+ *
+ * @param[in] data: Pointer to the parameters of the function
+ */
 void wait_tag_thread(uint32_t data);
 
 #endif //NODE

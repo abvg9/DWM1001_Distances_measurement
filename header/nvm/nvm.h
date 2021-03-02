@@ -18,7 +18,7 @@ typedef enum {
   tag_index = number_of_scanned_neighbors + 1, // Index of node must be a tag.
   my_neighbor_index = tag_index + 1, // Index of the node in the neighbors list.
   initiator_index = my_neighbor_index + 1, // Index of node must be the initiator.
-  was_a_tag_in_last_state = initiator_index + 1, // Indicate that in the last state this node was a tag.
+  was_a_tag_in_last_state = initiator_index + 1, // Indicate if in the last state this node was a tag.
   neighbors_start_address = was_a_tag_in_last_state + 1 // Initial address of the neighbors.
 } nvm_memory_position;
 
