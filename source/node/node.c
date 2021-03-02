@@ -373,7 +373,7 @@ void wait_tag_thread(uint32_t data) {
         
       }
 
-      if(tag_no_ended) {
+      if(tag_ended) {
         blink_led((uint32_t)&no_tag_founded_led);
       } else {
         blink_led((uint32_t)&tag_founded_led);
