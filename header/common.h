@@ -7,7 +7,8 @@
 /*******
  * NET *
  *******/
-#define NET_NUM_NODES 3
+#define NET_NUM_NODES 4
+#define PAIND 0xDECA
 
 /********
  * LEDS *
@@ -25,6 +26,7 @@ typedef enum {
 #define THREAD_PRIO       20
 #define THREAD_STACK_SIZE 3*1024
 #define ONE_SECOND 100 // Relationship between seconds and system ticks.
+#define MAX_TIME_IDLE 60000000
 
 /***********
  * STRUCTS *

@@ -106,7 +106,12 @@ void get_anchor_distances_thread(uint32_t data) {
   do {
     blink_led((uint32_t)&no_got_distances_led);
     dwm_loc_get(&loc);
-  } while(loc.anchors.dist.cnt != NET_NUM_NODES-1);
+  } while(loc.anchors.dist.cnt != NET_NUM_NODES-1 
+          && !is_idle_time_expired());
+
+  if(is_idle_time_expired()) {
+    reset_board();
+  }
 
   int i;
   for(i = 0; i < loc.anchors.dist.cnt; ++i) {
@@ -137,6 +142,10 @@ bool is_anchor_scan_finished(dwm_anchor_list_t anchors_list) {
   return finished;
 }
 
+bool is_idle_time_expired(void) {
+  return dwm_systime_us_get() >= MAX_TIME_IDLE;
+}
+
 int is_there_neighbor(uint16_t node_id) {
 
   if(neighbors.cnt == 0) {
@@ -163,6 +172,24 @@ int is_there_neighbor(uint16_t node_id) {
 
   return -1;
 
+}
+
+bool reset_board(void) {
+
+  uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
+  uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
+
+  if(!err_check(dwm_nvm_usr_data_get(nvm, len))) {
+    return false;
+  }
+
+  if(!err_check(clean_memory(nvm))) {
+    return false;
+  }
+  
+  dwm_reset();
+
+  return true;
 }
 
 void scan_neighbors_thread(uint32_t data) {
@@ -196,7 +223,12 @@ void scan_neighbors_thread(uint32_t data) {
       send_message(net_nodes_finded);
     }
 
-  } while(!is_anchor_scan_finished(anchors_list));
+  } while(!is_anchor_scan_finished(anchors_list) 
+          && !is_idle_time_expired());
+
+  if(is_idle_time_expired()) {
+    reset_board();
+  }
 
   uint64_t node_id;
   dwm_node_id_get(&node_id);
@@ -380,8 +412,11 @@ void wait_tag_thread(uint32_t data) {
       }
    
     }
-  } while(!tag_ended);
+  } while(!tag_ended && !is_idle_time_expired());
 
+  if(is_idle_time_expired()) {
+    reset_board();
+  }
 
   update_state();
 }

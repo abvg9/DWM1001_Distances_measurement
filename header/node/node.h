@@ -58,6 +58,15 @@ void get_anchor_distances_thread(uint32_t data);
 bool is_anchor_scan_finished(dwm_anchor_list_t anchors_list);
 
 /**
+ * @brief Check if all idle timer of a thread is expired.
+ *
+ * @return bool
+ * @retval true If idle timer was expired.
+ * @retval false If idle timer was not expired.
+ */
+bool is_idle_time_expired(void);
+
+/**
  * @brief Search if an id is in the list of neighbors.
  *
  * @param[in] node_id: Id to search.
@@ -67,6 +76,15 @@ bool is_anchor_scan_finished(dwm_anchor_list_t anchors_list);
  * @retval -1  If node_id is not inside neighbors list.
  */
 int is_there_neighbor(uint16_t node_id);
+
+/**
+ * @brief Reset the board to the initial state.
+ *
+ * @return bool
+ * @retval true If the node could be reset.
+ * @retval false If the node could not be reset.
+ */
+bool reset_board(void);
 
 /**
  * @brief Loop until all the nodes of the net are finded and
