@@ -179,7 +179,7 @@ bool reset_board(void) {
   uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
-  if(!err_check(dwm_nvm_usr_data_get(nvm, len))) {
+  if(!err_check(dwm_nvm_usr_data_get(nvm, &len))) {
     return false;
   }
 
