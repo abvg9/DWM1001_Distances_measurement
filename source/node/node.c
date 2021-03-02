@@ -109,22 +109,6 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
   return true;
 }
 
-bool cmp_neighbors_lists(rangin_neighbors loaded_neighbors) {
-
-  if(loaded_neighbors.cnt != neighbors.cnt) {
-    return false;
-  }
-
-  int i;
-  bool equal = true;
-
-  for(i = 0; i < loaded_neighbors.cnt && equal; ++i) {
-    equal = (loaded_neighbors.node_ids[i] == neighbors.node_ids[i]);
-  }
-
-  return equal;
-}
-
 int is_there_neighbor(uint16_t node_id) {
 
   if(neighbors.cnt == 0) {
@@ -293,11 +277,11 @@ void get_anchor_distances_thread(uint32_t data) {
 
 void update_state(void) {
 
-  uint8_t i_index = get_nvm_uint8_variable(initiator_index) + 1;
-  uint8_t t_index = get_nvm_uint8_variable(tag_index) + 1;
+  uint8_t i_index = (get_nvm_uint8_variable(initiator_index) + 1) % neighbors.cnt;
+  uint8_t t_index = (get_nvm_uint8_variable(tag_index) + 1) % neighbors.cnt;
 
-  set_nvm_uint8_variable(initiator_index, i_index%neighbors.cnt);
-  set_nvm_uint8_variable(tag_index, t_index%neighbors.cnt);
+  set_nvm_uint8_variable(initiator_index, i_index);
+  set_nvm_uint8_variable(tag_index, t_index);
 
   dwm_reset();
 }
