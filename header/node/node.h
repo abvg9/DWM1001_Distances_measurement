@@ -3,6 +3,14 @@
 
 #include "nvm.h"
 
+/************
+ * MESSAGES *
+ ************/
+typedef enum {
+  net_nodes_not_finded,
+  net_nodes_finded
+} message_type;
+
 /*************
  * FUNCTIONS *
  *************/
@@ -20,28 +28,15 @@
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg);
 
 /**
- * @brief Check if a given two positions their coordinates are equal.
+ * @brief Send a message that other nodes can read.
  *
- * @param[in] a: Position to compare.
- * @param[in] b: The other position to compare.
+ * @param[in] m: Type of message to send.
  *
  * @return bool
- * @retval true If the two positions are equal.
- * @retval false If the two positions are not equal.
+ * @retval true If the message could be sent.
+ * @retval false If the message could not be sent.
  */
-bool cmp_positions(dwm_pos_t a, dwm_pos_t b);
-
-/**
- * @brief Create a dwm_pos_t struct given the coordinates and the qf.
- *
- * @param[in] x: Coordinate in the cartesian axis X.
- * @param[in] y: Coordinate in the cartesian axis Y.
- * @param[in] z: Coordinate in the cartesian axis Z.
- * @param[in] qf: Quality of the coordinates.
- *
- * @return dwm_pos_t
- */
-dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t qf);
+bool send_message(message_type m);
 
 /**
  * @brief Loop until all the anchors of the net are finded.

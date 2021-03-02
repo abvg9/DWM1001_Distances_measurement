@@ -7,10 +7,6 @@ const dwm_cfg_common_t default_common_cfg = {DWM_UWB_MODE_ACTIVE, false, false, 
 const dwm_cfg_tag_t default_tag_cfg = {{}, false, false, false, DWM_MEAS_MODE_TWR};
 const dwm_cfg_anchor_t default_anchor_cfg = {{}, false, false};
 
-#define QF 100
-const dwm_pos_t anchor_final_position = { 1, 1, 1, QF };
-const dwm_pos_t anchor_initial_position = { 0, 0, 0, QF };
-
 extern rangin_neighbors neighbors;
 
 bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
@@ -69,6 +65,11 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg) {
   return true;
 }
 
+bool send_message(message_type m) {
+  dwm_pos_t message = {m , 0, 0, 0};
+  return err_check(dwm_pos_set(&message));
+}
+
 bool cmp_positions(dwm_pos_t a, dwm_pos_t b) {
   
   if(a.x != b.x) {
@@ -123,15 +124,13 @@ bool is_anchor_scan_finished(dwm_anchor_list_t anchors_list) {
 
   int i = 0;
   bool finished = true;
-  dwm_pos_t pos;
 
   if(anchors_list.cnt != NET_NUM_NODES-1) {
     return false;
   }
 
   while(i < anchors_list.cnt && finished) {
-    pos = create_position(anchors_list.v[i].x, anchors_list.v[i].y, anchors_list.v[i].z, QF);
-    finished = cmp_positions(pos, anchor_final_position);
+    finished = anchors_list.v[i].x == net_nodes_finded;
     i++;
   }
 
@@ -173,7 +172,7 @@ void scan_neighbors_thread(uint32_t data) {
   blink_led_struct anchors_found_led = {green_led, 0, 1.0f};
   int i;
 
-  set_position(anchor_initial_position);
+  send_message(net_nodes_not_finded);
 
   do {
 
@@ -196,7 +195,7 @@ void scan_neighbors_thread(uint32_t data) {
     }
 
     if(neighbors.cnt != NET_NUM_NODES-1) {
-      set_position(anchor_final_position);
+      send_message(net_nodes_finded);
     }
 
   } while(!is_anchor_scan_finished(anchors_list));
@@ -360,7 +359,26 @@ void wait_tag_thread(uint32_t data) {
   // If the node was a tag in the last state, it must wait 5 seconds.
   if(get_nvm_uint8_variable(was_a_tag_in_last_state)) {
     set_nvm_uint8_variable(was_a_tag_in_last_state, false);
-    dwm_thread_delay(ONE_SECOND*5);
+    bool tag_started = false;
+    //dwm_thread_delay(ONE_SECOND*5);
+    /* TODO */
+    // MIENTRAS AL QUE LE TOCA SER TAG AHORA SEA ANCHOR,
+    // ESPERATE TRANQUILAMENTE.
+    do {
+      if(err_check(dwm_anchor_list_get(&anchors_list))) {
+
+        for(i = 0; i < anchors_list.cnt && !tag_started; ++i) {
+          tag_started = (anchors_list.v[i].node_id == tag_id);
+        }
+
+        if(tag_started) {
+          blink_led((uint32_t)&no_tag_founded_led);
+        } else {
+          blink_led((uint32_t)&tag_founded_led);
+        }
+   
+      }
+    } while(!tag_started);
   }
 
   do {
