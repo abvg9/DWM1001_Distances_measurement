@@ -172,8 +172,6 @@ void scan_neighbors_thread(uint32_t data) {
   blink_led_struct anchors_found_led = {green_led, 0, 1.0f};
   int i;
 
-  send_message(net_nodes_not_finded);
-
   do {
 
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
@@ -248,6 +246,8 @@ bool set_node_as_anchor(bool is_initiator) {
   if(!err_check(dwm_cfg_get(&cfg))) {
     return false;
   }
+
+  send_message(clean_message_buffer);
 
   if(!check_configuration(DWM_MODE_ANCHOR, cfg) || cfg.initiator != is_initiator) {
 
@@ -359,28 +359,10 @@ void wait_tag_thread(uint32_t data) {
   // If the node was a tag in the last state, it must wait 5 seconds.
   if(get_nvm_uint8_variable(was_a_tag_in_last_state)) {
     set_nvm_uint8_variable(was_a_tag_in_last_state, false);
-    bool tag_started = false;
-    //dwm_thread_delay(ONE_SECOND*5);
-    /* TODO */
-    // MIENTRAS AL QUE LE TOCA SER TAG AHORA SEA ANCHOR,
-    // ESPERATE TRANQUILAMENTE.
-    do {
-      if(err_check(dwm_anchor_list_get(&anchors_list))) {
-
-        for(i = 0; i < anchors_list.cnt && !tag_started; ++i) {
-          tag_started = (anchors_list.v[i].node_id == tag_id);
-        }
-
-        if(tag_started) {
-          blink_led((uint32_t)&no_tag_founded_led);
-        } else {
-          blink_led((uint32_t)&tag_founded_led);
-        }
-   
-      }
-    } while(!tag_started);
+    send_message(tag_got_distances);
   }
 
+  // Wait until tag get distances.
   do {
     if(err_check(dwm_anchor_list_get(&anchors_list))) {
 
@@ -395,7 +377,8 @@ void wait_tag_thread(uint32_t data) {
       }
    
     }
-  } while(tag_no_ended);
+  } while(tag_no_ended && anchors_list.v[i].x == tag_got_distances);
+
 
   update_state();
 }

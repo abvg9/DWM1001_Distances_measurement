@@ -7,8 +7,9 @@
  * MESSAGES *
  ************/
 typedef enum {
-  net_nodes_not_finded,
-  net_nodes_finded
+  clean_message_buffer,
+  net_nodes_finded,
+  tag_got_distances
 } message_type;
 
 /*************
