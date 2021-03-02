@@ -131,7 +131,7 @@ bool is_anchor_scan_finished(dwm_anchor_list_t anchors_list) {
 
   while(i < anchors_list.cnt && finished) {
     pos = create_position(anchors_list.v[i].x, anchors_list.v[i].y, anchors_list.v[i].z, QF);
-    finished = !cmp_positions(pos, anchor_final_position);
+    finished = cmp_positions(pos, anchor_final_position);
     i++;
   }
 
