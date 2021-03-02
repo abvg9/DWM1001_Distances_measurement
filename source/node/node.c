@@ -101,7 +101,7 @@ dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t qf) {
 void get_anchor_distances_thread(uint32_t data) {
 
   dwm_loc_data_t loc;
-  blink_led_struct no_got_distances_led = {red1_led, 1, 1.0f};
+  blink_led_struct no_got_distances_led = {red1_led, 1, 0.1f};
 
   do {
     blink_led((uint32_t)&no_got_distances_led);
@@ -114,7 +114,7 @@ void get_anchor_distances_thread(uint32_t data) {
     printf("Distance: %lu mm\n", loc.anchors.dist.dist[i]);
   }
 
-  blink_led_struct got_distances_led = {blue_led, 1, 1.0f};
+  blink_led_struct got_distances_led = {blue_led, 1, 0.1f};
   blink_led((uint32_t)&got_distances_led);
 
   update_state();
@@ -168,8 +168,8 @@ int is_there_neighbor(uint16_t node_id) {
 void scan_neighbors_thread(uint32_t data) {
 
   dwm_anchor_list_t anchors_list;
-  blink_led_struct no_anchors_found_led = {red1_led, 1, 1.0f};
-  blink_led_struct anchors_found_led = {green_led, 0, 1.0f};
+  blink_led_struct no_anchors_found_led = {red1_led, 1, 0.1f};
+  blink_led_struct anchors_found_led = {green_led, 0, 0.1f};
   int i;
 
   do {
@@ -352,8 +352,8 @@ void wait_tag_thread(uint32_t data) {
   dwm_anchor_list_t anchors_list;
   uint16_t tag_id = neighbors.node_ids[get_nvm_uint8_variable(tag_index)];
   bool tag_no_ended = true;
-  blink_led_struct no_tag_founded_led = {red1_led, 1, 1.0f};
-  blink_led_struct tag_founded_led = {green_led, 1, 1.0f};
+  blink_led_struct no_tag_founded_led = {red1_led, 1, 0.1f};
+  blink_led_struct tag_founded_led = {green_led, 1, 0.1f};
   int i;
 
   // If the node was a tag in the last state, it must wait 5 seconds.
