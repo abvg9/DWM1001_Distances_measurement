@@ -179,11 +179,12 @@ bool set_node_as_tag(void) {
     return false;
   }
   
+  set_nvm_uint8_variable(was_a_tag_in_last_state, true);
+
   if(!check_configuration(DWM_MODE_TAG, cfg)) {
 
     dwm_cfg_tag_t tag_cfg = default_tag_cfg;
     tag_cfg.common = default_common_cfg;
-    set_nvm_uint8_variable(was_a_tag_in_last_state, true);
 
     if(!err_check(dwm_cfg_tag_set(&tag_cfg))) {
       return false;
