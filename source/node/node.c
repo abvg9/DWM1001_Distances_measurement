@@ -377,7 +377,7 @@ void wait_tag_thread(uint32_t data) {
       }
    
     }
-  } while(tag_no_ended && anchors_list.v[i].x == tag_got_distances);
+  } while(tag_no_ended && anchors_list.v[i].x != tag_got_distances);
 
 
   update_state();
