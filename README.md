@@ -12,21 +12,21 @@ The operation of this firmware is based on making the nodes go from anchor to ta
 ### Initial State
 In the initial state, all nodes are anchors. In this phase, all of them are waiting to detect the rest of the nodes of the network, each time a node is detected, an ordered insertion of the id of this node is made in a list of neighbors. This phase ends when all nodes detect the rest of the network nodes. Once finished, the node gets its id and is inserted neatly into the neighbor list. This state is a hell of a neighbor discovery phase.
 
-![Neighbor discovery phase](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Neighbor%20discovery%20phase.png)
+![Neighbor discovery phase](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Neighbor%20discovery%20phase.png?style=centerme)
 
 ### States
 Once the neighbor discovery phase is finished, each node checks in which mode it should operate (anchor or tag). To find out in which mode they should operate, all they have to do is look at their position in the list of neighbors. Initially, the node that is in position 0 of the neighbor list will be the tag and the rest of the nodes will be the anchors. At this moment, the node that is a tag will wait until it obtains all the distances to the rest of the nodes and the anchors will wait for the tag to finish calculating the distances. When the tag obtains its distances, it will notify the rest of the anchors that it has finished and all of them will advance their status. In such a way that, now the node that is in position 1 of the neighbor list will become the tag. This will repeat itself endlessly. In the following images a series of transitions of the state machine will be shown.
 
-![State 0](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/State%200.png)
+![State 0](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/State%200.png?style=centerme)
 
-![State 1](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/State%201.png)
+![State 1](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/State%201.png?style=centerme)
 
-![State 2](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/State%202.png)
+![State 2](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/State%202.png?style=centerme)
 
 ### Algorithm aspects
 If you look at the previous images, you can see that all the nodes of the network can find out the distances to the rest of the nodes in 3 changes of states. If we extrapolate this case to a case where there are n nodes, we know that the network will take time to know all the distances in n-1 transitions of the state machine.
 
-![Demostration of the algorithm cost](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Standar%20method%20formula.gif)
+![Demostration of the algorithm cost](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Standar%20method%20formula.gif?style=centerme)
 
 ## Technical aspects
 
