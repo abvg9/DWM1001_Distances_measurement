@@ -2,7 +2,7 @@
 output/
 
 #Readme files
-#assets/
+assets/
 
 #Segger configurations
 *.emSession
