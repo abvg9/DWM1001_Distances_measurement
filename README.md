@@ -2,6 +2,8 @@
 
 This firmware is intended to be used on the DWM1001-Dev boards to measure distances between them making use of the provided library by Decawave.
 [Here](https://www.decawave.com/product/dwm1001-development-board/) you can download all the documentation and software provided by Decawave.
+In the repository there is a project that is designed to run in the SEGGER development environment. In order to use it, you must modify the build_tool_chain_directory variable and set the path to the compiler on your computer. If you do not understand anything that is being explained, we recommend that you go to the Decawave documentation and read how to use the SEGGGER development environment and how to run its examples.
+
 
 ## Introduction
 The Decawave library distinguishes between two types of nodes, anchors and tags. Anchors are intended to have a fixed position and tags are free to move. The expected operation is that the tags find out their position thanks to an exchange of messages with the anchors. This architecture greatly limits the possible use of DWM1001 boards when implementing different decentralized systems in which necessarily all nodes can be in motion, for example for autonomous vehicle patrols. This firmware solves this problem, making it possible for all nodes to move freely and obtain the distances between the different nodes.
