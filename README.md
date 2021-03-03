@@ -65,7 +65,7 @@ bool send_message(message_type m) {
 * All nodes must be within 200 meters, which is the maximum distance at which one DWM1001 board can detect another.
 
 ## Future releases
-Tras considerarlo, hemos creido que lo mejor es terminar el desarrollo de este proytecto y comenzar uno nuevo, de tal modo que ya no usaremos la libreria de dwm y nos crearemos las nuestras propias. El [nuevo proyecto](https://github.com/UCM-237/DWM1001_Distance_measurement_v2) implementará lo que tiene este firmware además de un sistema mejorado en el que la obtención de distancias será el doble de rápido. 
+After considering it, we have believed that it is best to finish the development of this project and start a new one, in such a way that we will no longer use the dwm library and we will create our own. The [new proyect](https://github.com/UCM-237/DWM1001_Distance_measurement_v2) will implement what this firmware has in addition to an improved system in which obtaining distances will be twice as fast. We hope to have it before the end of 2021.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
