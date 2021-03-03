@@ -1,6 +1,9 @@
 #Folders
 output/
 
+#Readme files
+assets/
+
 #Segger configurations
 *.emSession
 *.jlink
