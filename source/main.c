@@ -5,8 +5,6 @@ rangin_neighbors neighbors;
 
 int dwm_user_start(void) {
 
-  // while(controller send a message)
-  // swtich case with the commands.
   uint8_t nvm[DWM_NVM_USR_DATA_LEN_MAX];
   uint8_t len = DWM_NVM_USR_DATA_LEN_MAX;
 
