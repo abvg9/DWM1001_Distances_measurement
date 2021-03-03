@@ -53,3 +53,6 @@ bool send_message(message_type m) {
 ```
 
 ## Limitations
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
