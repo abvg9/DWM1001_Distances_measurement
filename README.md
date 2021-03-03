@@ -37,7 +37,7 @@ There are certain technical aspects that can be useful if you want to make modif
 * When a node changes from tag to anchor or vice versa, we need to reset the board. This implies that we necessarily need to save information in non-volatile storage, such as non-volatile memory. The dwm library provides us with mechanisms to write and read from it and what this firmware does is add an abstraction layer to manipulate the non-volatile memory in a finer grain and store information about the current state of the state machine. The following information is stored in the NVM:
 Number of neighbors in the network, index of the node that has to be a tag, index of the node in the neighbor list, index of the anchor node that should initiate communications with the rest, boolean that indicates if in the last state the node was tag and identifiers of the neighbors the node have scanned.
 * If you want to know more information about the NVM and the different variables stored in it to make the state machine work, it is recommended to see the [nvm.c](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/source/nvm/nvm.c) and [nvm.h](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/header/nvm/nvm.h) files for a better understanding.
-* To send messages between the nodes, this firmware takes advantage of the proper sending of messages that the dwm library does to send information. This is due to the fact that dwm has the capabilities of sending messages from one node to another. The way to send messages is through indicating positions to the node. When a node wants to send a message to others, it must write in its position register the value that it wants others to read, specifically, it must modify the X position.
+* To send messages between the nodes, this firmware takes advantage of the proper sending of messages that the dwm library does to send information. This is due to the fact that dwm library does not allow messages to be sent from one node to another. The way to send messages is through indicating positions to the node. When a node wants to send a message to others, it must write in its position register the value that it wants others to read, specifically, it must modify the X position. This message sending mechanism only works for anchors, that is, if the node is anchor, it can be used, but being tag, messages cannot be sent to other nodes.
 ```c++
 typedef enum {
   clean_message_buffer,
@@ -51,8 +51,21 @@ bool send_message(message_type m) {
   return err_check(dwm_pos_set(&message));
 }
 ```
+* This firmware is designed to work even if the boards are turned off and on again. The nodes will maintain the state before the shutdown and will continue working.
+* When the board has a permanent green led on, it will mean that said node is a tag, if it has a permanently on blue led it will mean that it is anchor. When the nodes have LEDs flashing, it means that they are waiting to pass state.
+* For more information look at the code, it is fully documented.
 
 ## Limitations
+* The network must have a number of fixed nodes. This value is determined in the [common.h](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/header/common.h) file, in the NET_NUM_NODES variable.
+```c++
+#define NET_NUM_NODES 4
+```
+* The network can only have DWM_RANGING_ANCHOR_CNT_MAX (14) nodes.
+* If for any reason, one of the nodes of the network falls, the others will end up returning to the initial state, waiting for it to return, but will remain permanently in that state until it returns.
+* All nodes must be within 200 meters, which is the maximum distance at which one DWM1001 board can detect another.
+
+## Future releases
+Tras considerarlo, hemos creido que lo mejor es terminar el desarrollo de este proytecto y comenzar uno nuevo, de tal modo que ya no usaremos la libreria de dwm y nos crearemos las nuestras propias. El [nuevo proyecto](https://github.com/UCM-237/DWM1001_Distance_measurement_v2) implementará lo que tiene este firmware además de un sistema mejorado en el que la obtención de distancias será el doble de rápido. 
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
