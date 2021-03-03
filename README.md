@@ -63,6 +63,8 @@ bool send_message(message_type m) {
 * The network can only have DWM_RANGING_ANCHOR_CNT_MAX (14) nodes.
 * If for any reason, one of the nodes of the network falls, the others will end up returning to the initial state, waiting for it to return, but will remain permanently in that state until it returns.
 * All nodes must be within 200 meters, which is the maximum distance at which one DWM1001 board can detect another.
+* If you want to modify the number of nodes in the network, you will have to modify the variable NET_NUM_NODES, erase all the memory and load the program again on all nodes.
+* Whenever you use a node on a new network, it must erase all the memory of the device. If not, the nvm of the device will not be updated with that of a new network and it will not work.
 
 ## Future releases
 After considering it, we have believed that it is best to finish the development of this project and start a new one, in such a way that we will no longer use the dwm library and we will create our own. The [new proyect](https://github.com/UCM-237/DWM1001_Distance_measurement_v2) will implement what this firmware has in addition to an improved system in which obtaining distances will be twice as fast. We hope to have it before the end of 2021.
