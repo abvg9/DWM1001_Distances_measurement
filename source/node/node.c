@@ -70,11 +70,6 @@ bool send_message(message_type m) {
   return err_check(dwm_pos_set(&message));
 }
 
-dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t qf) {
-  dwm_pos_t pos = {x, y, z, qf};
-  return pos;
-}
-
 void get_anchor_distances_thread(uint32_t data) {
 
   dwm_loc_data_t loc;
