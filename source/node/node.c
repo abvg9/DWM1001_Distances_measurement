@@ -70,31 +70,8 @@ bool send_message(message_type m) {
   return err_check(dwm_pos_set(&message));
 }
 
-bool cmp_positions(dwm_pos_t a, dwm_pos_t b) {
-  
-  if(a.x != b.x) {
-    return false;
-  }
-
-  if(a.y != b.y) {
-    return false;
-  }
-
-  if(a.z != b.z) {
-    return false;
-  }
-
-  if(a.qf != b.qf) {
-    return false;
-  }
-
-  return true;
-}
-
 dwm_pos_t create_position(int32_t x, int32_t y, int32_t z, uint8_t qf) {
-
   dwm_pos_t pos = {x, y, z, qf};
-
   return pos;
 }
 
@@ -342,10 +319,6 @@ bool set_node_as_tag(void) {
   return true;
 }
 
-bool set_position(dwm_pos_t pos) {
-  return err_check(dwm_pos_set(&pos));
-}
-
 void store_neighbor(uint64_t node_id) {
 
   if(neighbors.cnt == 0) {
@@ -388,7 +361,6 @@ void wait_tag_thread(uint32_t data) {
   blink_led_struct tag_founded_led = {green_led, 1, 0.1f};
   int i;
 
-  // If the node was a tag in the last state, it must wait 5 seconds.
   if(get_nvm_uint8_variable(was_a_tag_in_last_state)) {
     set_nvm_uint8_variable(was_a_tag_in_last_state, false);
     send_message(tag_got_distances);
