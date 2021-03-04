@@ -11,7 +11,7 @@ The Decawave library distinguishes between two types of nodes, anchors and tags.
 The operation of this firmware is based on making the nodes go from anchor to tag in an orderly manner, coordinated between the different nodes in order to obtain the different distances between them. The behavior of the firmware can be explained through a state machine.
 
 ### Initial State
-In the initial state, all nodes are anchors. In this phase, all of them are waiting to detect the rest of the nodes of the network, each time a node is detected, an ordered insertion of the id of this node is made in a list of neighbors. This phase ends when all nodes detect the rest of the network nodes. Once finished, the node gets its id and is inserted neatly into the neighbor list. This state is called neighbor discovery phase.
+In the initial state, all nodes are anchors. In this phase, all of them are waiting to detect the rest of the nodes of the network, each time a node is detected, an ordered insertion of the id of this node is made in a list of neighbors. This phase ends when all nodes detect the rest of the network nodes. Once finished, the node gets its id an orderly insertion is made into the neighbor list. This state is called neighbor discovery phase.
 
 ![Neighbor discovery phase](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Neighbor%20discovery%20phase.png)
 
