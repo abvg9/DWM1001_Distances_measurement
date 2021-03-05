@@ -30,6 +30,7 @@ bool check_configuration(dwm_mode_t expected_mode, dwm_cfg_t cfg);
 
 /**
  * @brief Send a message that other nodes can read.
+ * @note This mechanisim only works between anchors.
  *
  * @param[in] m: Type of message to send.
  *
@@ -58,7 +59,7 @@ void get_anchor_distances_thread(uint32_t data);
 bool is_anchor_scan_finished(dwm_anchor_list_t anchors_list);
 
 /**
- * @brief Check if all idle timer of a thread is expired.
+ * @brief Check if idle timer of a thread is expired.
  *
  * @return bool
  * @retval true If idle timer was expired.
