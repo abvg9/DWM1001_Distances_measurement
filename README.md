@@ -47,7 +47,7 @@ Calculate the difference between all adjacent terms:
 
 ![Simplify](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Simplify.png)
 
-Generic formula of a arithmetic progresion sucesion:
+Generic formula of a arithmetic sucesion:
 
 ![Generic formula of a arithmetic progresion sucesion](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Generic%20formula%20of%20a%20arithmetic%20progresion%20sucesion.png)
 
