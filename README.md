@@ -38,17 +38,21 @@ Arithmetic progresion:
 ![Arithmetic progresion](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Arithmetic%20progresion.png)
 
 Check if the difference is constant:
+
 ![Check if the difference is constant](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Arithmetic%20progresion.png)
 
 Calculate the difference between all adjacent terms:
+
 ![Calculate the difference between all adjacent terms](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Difference%20between%20all%20adjacent%20terms.png)
 
 ![Simplify](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Simplify.png)
 
 Generic formula of a arithmetic progresion sucesion:
+
 ![Generic formula of a arithmetic progresion sucesion](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Generic%20formula%20of%20a%20arithmetic%20progresion%20sucesion.png)
 
 Substitution and simplify:
+
 ![Substitution and simplify](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Substitution%20and%20simplify.png)
 
 ## Technical aspects
