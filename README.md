@@ -39,7 +39,7 @@ Arithmetic progresion:
 
 Check if the difference is constant:
 
-![Check if the difference is constant](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Arithmetic%20progresion.png)
+![Check if the difference is constant](https://github.com/UCM-237/DWM1001_Distances_measurement/blob/main/assets/Constant%20demostration.png)
 
 Calculate the difference between all adjacent terms:
 
